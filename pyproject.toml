@@ -44,7 +44,7 @@ classifiers = [
 Homepage = "https://github.com/joehart2001/PoreTorch"
 Repository = "https://github.com/joehart2001/PoreTorch"
 Issues = "https://github.com/joehart2001/PoreTorch/issues"
-Documentation = "https://github.com/joehart2001/PoreTorch#readme"
+Documentation = "https://joehart2001.github.io/poretorch/"
 
 [tool.setuptools]
 packages = ["poretorch"]
