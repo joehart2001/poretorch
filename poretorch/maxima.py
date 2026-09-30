@@ -8,7 +8,7 @@ pore-size definition.
 """
 
 import numpy as np
-from scipy.ndimage import maximum_filter
+from scipy.ndimage import maximum_filter1d
 
 
 def local_maxima(
@@ -57,8 +57,17 @@ def local_maxima(
     field = np.where(void_mask, clearance.astype(np.float64), -np.inf)
 
     periodic = _pbc_tuple(pbc)
-    mode = "wrap" if all(periodic) else "nearest"
-    peaks = maximum_filter(field, size=filter_size, mode=mode) == field
+    filtered = field
+    # Apply the box maximum one axis at a time so mixed boundary conditions are
+    # respected. A single mode cannot express periodic x/y and open z.
+    for axis, wraps in enumerate(periodic):
+        filtered = maximum_filter1d(
+            filtered,
+            size=filter_size,
+            axis=axis,
+            mode="wrap" if wraps else "nearest",
+        )
+    peaks = filtered == field
     peaks &= void_mask & (field >= min_radius)
 
     indices = np.argwhere(peaks)
