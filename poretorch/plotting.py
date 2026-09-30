@@ -5,6 +5,8 @@ the diameter axis defaults to logarithmic. A linear axis crowds everything
 interesting into its left edge.
 """
 
+from __future__ import annotations
+
 import matplotlib
 
 matplotlib.use("Agg")

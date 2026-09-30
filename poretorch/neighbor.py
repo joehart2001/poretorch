@@ -17,6 +17,8 @@ finally handed to the brute-force kernel, so the two backends agree to
 floating-point rounding by construction.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from itertools import product
 

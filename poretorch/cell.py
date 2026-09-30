@@ -10,6 +10,8 @@ wrap the displacement into that basis, and then search the 27 surrounding
 lattice images. That search is exact for a reduced basis in three dimensions.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from itertools import product
 

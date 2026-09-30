@@ -7,6 +7,8 @@ the perpendicular widths rather than the lattice-vector lengths, which is what
 keeps the resolution uniform in a skewed triclinic cell.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from typing import Iterator
 

@@ -48,11 +48,10 @@ or to drive the calculation from raw arrays rather than an ASE object.
 
 ```{eval-rst}
 .. autofunction:: poretorch.atomic_radii
-.. autodata:: poretorch.UFF_SIGMA
-   :no-value:
-.. autodata:: poretorch.PROBE_RADII
-   :no-value:
 ```
+
+The built-in lookup tables are available as `poretorch.UFF_SIGMA` and
+`poretorch.PROBE_RADII`.
 
 ## Cell geometry
 
