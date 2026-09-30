@@ -1,5 +1,8 @@
 # Build notes
 
+> Historical snapshot from the initial build. The release state and limitations
+> below describe 2026-08-21 and may have since been addressed.
+
 Working notes from the initial build of PoreTorch on 2026-08-21. Scratch record
 of what was decided and why, not user-facing documentation. The user-facing
 material is `README.md` and `docs/source/`.
