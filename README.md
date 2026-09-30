@@ -1,3 +1,5 @@
+![PoreTorch logo](logo.svg)
+
 # PoreTorch
 
 PoreTorch computes geometric pore-size distributions from atomistic structures.
@@ -178,6 +180,20 @@ use a Minkowski-reduced basis, including for skewed triclinic cells.
 python -m pip install -e ".[dev]"
 pytest -q
 ```
+
+### Documentation
+
+Build the documentation locally with:
+
+```bash
+python -m pip install -e ".[docs]"
+sphinx-build -W --keep-going -b html docs/source docs/build/html
+```
+
+Documentation is deployed to GitHub Pages by `.github/workflows/docs.yml` after
+each push to `main`. Enable it once under **Settings → Pages → Source: GitHub
+Actions**. The published site will be available at
+<https://joehart2001.github.io/poretorch/>.
 
 See [`docs/source/methods.md`](docs/source/methods.md) for the detailed method
 definitions and [`docs/source/api.md`](docs/source/api.md) for the API.
