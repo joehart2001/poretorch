@@ -10,6 +10,8 @@ standard error alongside, since a single amorphous configuration is one sample o
 an ensemble and its distribution is noisy on its own.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -143,7 +145,7 @@ def field_from_atoms(
     grid_spacing: float = DEFAULT_GRID_SPACING,
     probe_radius=0.0,
     method: str = "cell_list",
-    device: str | torch.device = "cuda",
+    device: str | torch.device | None = "auto",
     torch_dtype: torch.dtype = torch.float32,
     **kwargs,
 ) -> DistanceField:
@@ -166,7 +168,8 @@ def field_from_atoms(
     method
         ``"cell_list"`` or ``"brute"``.
     device
-        Torch device used for computation.
+        Torch device used for computation. ``"auto"`` selects CUDA when
+        available and otherwise uses the CPU.
     torch_dtype
         Torch dtype used for tensors.
     **kwargs
@@ -211,7 +214,7 @@ def analyse(
     connectivity: int = 1,
     min_voxels: int = 1,
     field_method: str = "cell_list",
-    device: str | torch.device = "cuda",
+    device: str | torch.device | None = "auto",
     torch_dtype: torch.dtype = torch.float32,
     index=None,
     read_kwargs=None,
@@ -249,7 +252,8 @@ def analyse(
     field_method
         Distance-field backend: ``"cell_list"`` or ``"brute"``.
     device
-        Torch device used for computation.
+        Torch device used for computation. ``"auto"`` selects CUDA when
+        available and otherwise uses the CPU.
     torch_dtype
         Torch dtype used for tensors.
     index
@@ -314,7 +318,7 @@ def psd(
     connectivity: int = 1,
     min_voxels: int = 1,
     field_method: str = "cell_list",
-    device: str | torch.device = "cuda",
+    device: str | torch.device | None = "auto",
     torch_dtype: torch.dtype = torch.float32,
     index=None,
     read_kwargs=None,
@@ -359,7 +363,8 @@ def psd(
     field_method
         Distance-field backend: ``"cell_list"`` or ``"brute"``.
     device
-        Torch device used for computation.
+        Torch device used for computation. ``"auto"`` selects CUDA when
+        available and otherwise uses the CPU.
     torch_dtype
         Torch dtype used for tensors.
     index

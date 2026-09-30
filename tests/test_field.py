@@ -3,7 +3,7 @@ import pytest
 import torch
 
 from poretorch.cell import cell_tensor, mic_distance, minimum_image_setup, pbc_tensor
-from poretorch.field import distance_field
+from poretorch.field import _resolve_device, distance_field
 
 
 def _field(positions, cell, **kwargs):
@@ -137,3 +137,13 @@ def test_invalid_inputs_are_rejected():
         _field(np.zeros((1, 4)), cell)
     with pytest.raises(ValueError, match="at least one atom"):
         _field(np.zeros((0, 3)), cell)
+    with pytest.raises(ValueError, match="atomic radii"):
+        _field(np.zeros((1, 3)), cell, radii=-1.0)
+    with pytest.raises(ValueError, match="probe_radius"):
+        _field(np.zeros((1, 3)), cell, probe_radius=np.nan)
+
+
+def test_auto_device_selects_an_available_backend():
+    expected = "cuda" if torch.cuda.is_available() else "cpu"
+    assert _resolve_device("auto").type == expected
+    assert _resolve_device(None).type == expected

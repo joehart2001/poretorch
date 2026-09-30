@@ -115,7 +115,8 @@ def resolve_radii(radii, n_atoms: int, symbols=None) -> np.ndarray:
     if isinstance(radii, str):
         if symbols is None:
             raise ValueError(f'radii="{radii}" needs chemical symbols to look up')
-        return atomic_radii(symbols, table=radii)
+        result = atomic_radii(symbols, table=radii)
+        return _validate_radii(result)
 
     if isinstance(radii, dict):
         if symbols is None:
@@ -123,14 +124,22 @@ def resolve_radii(radii, n_atoms: int, symbols=None) -> np.ndarray:
         missing = sorted({s for s in symbols if s not in radii})
         if missing:
             raise KeyError(f"radii mapping is missing element(s) {missing}")
-        return np.array([float(radii[s]) for s in symbols], dtype=np.float64)
+        result = np.array([float(radii[s]) for s in symbols], dtype=np.float64)
+        return _validate_radii(result)
 
     arr = np.asarray(radii, dtype=np.float64)
     if arr.ndim == 0:
-        return np.full(n_atoms, float(arr), dtype=np.float64)
+        return _validate_radii(np.full(n_atoms, float(arr), dtype=np.float64))
     if arr.shape != (n_atoms,):
         raise ValueError(f"radii must be scalar or ({n_atoms},), got {arr.shape}")
-    return arr
+    return _validate_radii(arr)
+
+
+def _validate_radii(radii: np.ndarray) -> np.ndarray:
+    """Reject radii that cannot define a physical atomic surface."""
+    if not np.all(np.isfinite(radii)) or np.any(radii < 0.0):
+        raise ValueError("atomic radii must be finite and non-negative")
+    return radii
 
 
 def resolve_probe(probe_radius) -> float:
@@ -155,6 +164,6 @@ def resolve_probe(probe_radius) -> float:
             )
         return PROBE_RADII[probe_radius]
     value = float(probe_radius)
-    if value < 0.0:
-        raise ValueError(f"probe_radius must be >= 0, got {value}")
+    if not np.isfinite(value) or value < 0.0:
+        raise ValueError(f"probe_radius must be finite and >= 0, got {value}")
     return value

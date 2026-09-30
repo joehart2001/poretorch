@@ -55,8 +55,20 @@ def test_psd_averages_over_frames(carbon_atoms):
 
 def test_averaging_zero_extends_rather_than_truncating(carbon_atoms):
     """A frame with a bigger pore must not be clipped to a shorter histogram."""
-    short = psd(carbon_atoms, bin_width=0.5, max_diameter=3.0, **CPU)
-    long = psd(carbon_atoms, bin_width=0.5, max_diameter=9.0, **CPU)
+    short = psd(
+        carbon_atoms,
+        bin_width=0.5,
+        max_diameter=3.0,
+        allow_truncation=True,
+        **CPU,
+    )
+    long = psd(
+        carbon_atoms,
+        bin_width=0.5,
+        max_diameter=9.0,
+        allow_truncation=True,
+        **CPU,
+    )
     combined = average_psds([short, long])
 
     assert combined.volume_A3.size == long.volume_A3.size

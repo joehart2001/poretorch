@@ -6,8 +6,8 @@ Install for development:
 pip install -e .
 ```
 
-An NVIDIA GPU is strongly recommended but not required. Pass `device="cpu"` to
-run anywhere.
+`device="auto"` is the default: CUDA is used when available and the CPU
+otherwise.
 
 ## One structure, one distribution
 
@@ -90,7 +90,7 @@ distribution:
 ```python
 result = analyse(atoms, method="covering", probe_radius="N2")
 
-print(result.field.porosity)                     # accessible void fraction
+print(result.field.porosity)                     # local probe-fit void fraction
 print(result.field.specific_void_volume)         # cc/g
 print(result.labels.summary())                   # counts and volumes by kind
 

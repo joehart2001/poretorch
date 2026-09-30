@@ -12,6 +12,8 @@ PoreBlazer and Zeo++ use for adsorptive-accessible pore sizes, and it is what
 makes ``probe_radius="N2"`` results comparable with theirs.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass
 
 import numpy as np
@@ -160,7 +162,7 @@ def distance_field(
     bin_width: float | None = None,
     max_ring: int = DEFAULT_MAX_RING,
     batch_size: int = DEFAULT_BATCH_SIZE,
-    device: str | torch.device = "cuda",
+    device: str | torch.device | None = "auto",
     torch_dtype: torch.dtype = torch.float32,
     progress: bool = False,
 ) -> DistanceField:
@@ -204,7 +206,8 @@ def distance_field(
     batch_size
         Grid points evaluated per batch. Lower this if GPU memory is tight.
     device
-        Torch device string or object used for computation.
+        Torch device used for computation. ``"auto"`` (the default) selects
+        CUDA when available and otherwise uses the CPU.
     torch_dtype
         Torch dtype used for tensors. ``torch.float64`` if you need it.
     progress
@@ -218,7 +221,7 @@ def distance_field(
     if method not in {"cell_list", "brute"}:
         raise ValueError(f'method must be "cell_list" or "brute", got {method!r}')
 
-    device = torch.device(device)
+    device = _resolve_device(device)
     pos_t = torch.as_tensor(positions, device=device, dtype=torch_dtype)
     if pos_t.ndim != 2 or pos_t.shape[1] != 3:
         raise ValueError(f"positions must be (n_atoms,3), got {tuple(pos_t.shape)}")
@@ -275,6 +278,13 @@ def distance_field(
         radii=radii_t,
         masses=masses_np,
     )
+
+
+def _resolve_device(device: str | torch.device | None) -> torch.device:
+    """Resolve the public ``"auto"`` device spelling."""
+    if device is None or (isinstance(device, str) and device.lower() == "auto"):
+        return torch.device("cuda" if torch.cuda.is_available() else "cpu")
+    return torch.device(device)
 
 
 def _cell_list_clearance(
