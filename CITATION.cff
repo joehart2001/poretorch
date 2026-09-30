@@ -1,0 +1,12 @@
+cff-version: 1.2.0
+message: "If you use PoreTorch, please cite it as below."
+type: software
+title: "PoreTorch: GPU-accelerated geometric pore-size distributions"
+authors:
+  - family-names: Hart
+    given-names: Joseph
+    orcid: "https://orcid.org/0009-0005-0461-1436"
+repository-code: "https://github.com/joehart2001/PoreTorch"
+url: "https://github.com/joehart2001/PoreTorch"
+license: MIT
+year: 2026

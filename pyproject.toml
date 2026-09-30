@@ -1,0 +1,54 @@
+[build-system]
+requires = ["setuptools>=64", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "PoreTorch"
+version = "0.1.0"
+description = "GPU-accelerated geometric pore-size distributions for porous and amorphous materials, with PyTorch."
+authors = [{ name = "Joseph Hart" }]
+readme = { file = "README.md", "content-type" = "text/markdown" }
+requires-python = ">=3.10"
+license = "MIT"
+dependencies = [
+  "numpy",
+  "torch>=2.0",
+  "scipy",
+  "ase",
+  "matplotlib",
+  "tqdm",
+]
+keywords = [
+  "pore size distribution", "psd", "porosity", "porous materials",
+  "amorphous carbon", "largest empty sphere", "cuda", "gpu", "pytorch", "ase",
+]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Intended Audience :: Science/Research",
+  "Intended Audience :: Developers",
+  "Programming Language :: Python :: 3",
+  "Programming Language :: Python :: 3 :: Only",
+  "Programming Language :: Python :: 3.10",
+  "Programming Language :: Python :: 3.11",
+  "Programming Language :: Python :: 3.12",
+  "Operating System :: OS Independent",
+  "Topic :: Scientific/Engineering",
+  "Topic :: Scientific/Engineering :: Chemistry",
+  "Topic :: Scientific/Engineering :: Physics",
+  "Topic :: Software Development :: Libraries",
+  "Topic :: Software Development :: Libraries :: Python Modules",
+  "Topic :: Utilities",
+]
+
+[project.urls]
+Homepage = "https://github.com/joehart2001/PoreTorch"
+Repository = "https://github.com/joehart2001/PoreTorch"
+Issues = "https://github.com/joehart2001/PoreTorch/issues"
+Documentation = "https://github.com/joehart2001/PoreTorch#readme"
+
+[tool.setuptools]
+packages = ["poretorch"]
+
+[project.optional-dependencies]
+dev = ["pytest"]
+docs = ["sphinx", "sphinx-rtd-theme", "myst-parser"]
