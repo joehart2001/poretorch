@@ -1,11 +1,8 @@
 """Greedy packing of non-overlapping inscribed spheres into the void.
 
-The packed-sphere pore size answers "what set of discrete, non-overlapping
-spheres tiles this void?". Because no two accepted spheres overlap, void volume
-is never counted twice, which makes the resulting distribution a partition of
-(most of) the void rather than a smoothed local average. The price is that
-packing leaves interstitial gaps, so the packed volume is always somewhat less
-than the true void volume.
+The result is a discrete sphere-packing spectrum. It is not a partition or a
+voxel-wise measure of the void: gaps remain between accepted spheres, and the
+histogram is weighted by analytic sphere volume.
 
 Candidates are the local maxima of the clearance field, taken largest first. A
 candidate is accepted when it clears every sphere accepted so far. The pass is
@@ -13,6 +10,8 @@ global rather than per pore: spheres in different pores cannot overlap through a
 solid wall anyway, and a single pass keeps the no-double-counting guarantee
 unconditional.
 """
+
+from __future__ import annotations
 
 from dataclasses import dataclass
 
@@ -57,23 +56,23 @@ class SpherePacking:
         """Combined volume of the packed spheres in cubic Angstrom."""
         return float((4.0 / 3.0) * np.pi * np.sum(self.radii**3))
 
-    def filling_fraction(self, void_volume: float) -> float:
+    def fraction_of(self, reference_volume: float) -> float:
         """
-        Fraction of the void volume that the packed spheres account for.
+        Packed volume as a fraction of a caller-supplied reference volume.
 
         Parameters
         ----------
-        void_volume
-            Accessible void volume in cubic Angstrom.
+        reference_volume
+            Reference volume in cubic Angstrom, normally the cell volume.
 
         Returns
         -------
         float
-            Packed volume divided by void volume.
+            Packed volume divided by the reference volume.
         """
-        if void_volume <= 0.0:
+        if reference_volume <= 0.0:
             return 0.0
-        return self.volume / void_volume
+        return self.volume / reference_volume
 
 
 def pack_spheres(

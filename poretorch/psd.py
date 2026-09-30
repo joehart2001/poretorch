@@ -21,28 +21,30 @@ with **non-overlapping** ones, and that is the sharpest division between them:
     definition PoreBlazer and Zeo++ use, and the one to compare against them.
 
 ``"packed"`` (non-overlapping spheres)
-    The void is filled greedily with inscribed spheres, largest first, accepting
-    one only if it clears every sphere already accepted. The accepted set is
-    disjoint, so the distribution partitions the void instead of averaging it
-    locally, at the cost of the interstitial gaps a packing must leave.
+    Local-clearance maxima are visited largest first and accepted only when the
+    sphere clears every sphere already accepted. Radii are capped where needed
+    to avoid overlap with periodic replicas or open cell boundaries. This is a
+    spectrum of discrete inscribed spheres, not a partition of the void.
 
 Overlap decides which size a point is labelled with, not how much volume it
 contributes, so no method double-counts void volume. The two overlapping methods
 weight each void *voxel* by its own voxel volume, counted exactly once, so they
 integrate to the accessible void volume however much their spheres overlap.
-``"packed"`` weights each *sphere* by its sphere volume, which is sound only
-because the spheres are disjoint, and integrates to the packed volume, smaller
-than the void volume by those gaps.
+``"packed"`` weights each accepted sphere by its sphere volume. Its absolute
+scale is therefore different from the voxel-weighted methods.
 """
 
+from __future__ import annotations
+
 from dataclasses import dataclass, field as dataclass_field
+from itertools import product
 
 import numpy as np
 import torch
 from torch import Tensor
 from tqdm import tqdm
 
-from .cell import mic_distance
+from .cell import mic_distance, perpendicular_widths
 from .field import DistanceField
 from .maxima import local_maxima
 from .packing import SpherePacking, pack_spheres
@@ -435,6 +437,7 @@ def bin_distribution(
     weights,
     bin_width: float = DEFAULT_BIN_WIDTH,
     max_diameter: float | None = None,
+    allow_truncation: bool = False,
 ) -> tuple[np.ndarray, np.ndarray]:
     """
     Histogram pore radii into diameter bins, weighted by volume.
@@ -450,6 +453,9 @@ def bin_distribution(
     max_diameter
         Upper edge of the last bin in Angstrom. Defaults to just above the
         largest diameter present.
+    allow_truncation
+        Permit values above the histogram range to be discarded. The default
+        raises instead of silently losing volume.
 
     Returns
     -------
@@ -472,8 +478,20 @@ def bin_distribution(
         upper = float(diameters.max()) if diameters.size else bin_width
     else:
         upper = float(max_diameter)
+        if not np.isfinite(upper) or upper <= 0.0:
+            raise ValueError(f"max_diameter must be finite and > 0, got {upper}")
     n_bins = max(1, int(np.ceil(upper / bin_width)))
     edges = np.arange(n_bins + 1, dtype=np.float64) * bin_width
+
+    if (
+        diameters.size
+        and float(diameters.max()) > edges[-1] + 1e-12
+        and not allow_truncation
+    ):
+        raise ValueError(
+            f"max_diameter excludes values up to {float(diameters.max()):.6g} A. "
+            "Increase it, omit it, or pass allow_truncation=True"
+        )
 
     volume, _ = np.histogram(diameters, bins=edges, weights=weights)
     centers = 0.5 * (edges[:-1] + edges[1:])
@@ -487,6 +505,7 @@ def pore_size_distribution(
     labels=None,
     bin_width: float = DEFAULT_BIN_WIDTH,
     max_diameter: float | None = None,
+    allow_truncation: bool = False,
     min_radius: float = 0.0,
     overlap_tolerance: float = 0.0,
     center_mode: str = "all_void",
@@ -518,6 +537,9 @@ def pore_size_distribution(
     max_diameter
         Upper edge of the last bin in Angstrom. Defaults to the largest diameter
         present.
+    allow_truncation
+        Permit ``max_diameter`` to discard larger values. False by default so
+        histogram truncation cannot silently lose volume.
     min_radius
         Ignore pore radii below this, in Angstrom. For ``"packed"`` this is also
         the smallest sphere that may be accepted, and is the main control on
@@ -541,7 +563,7 @@ def pore_size_distribution(
     PSD
         The distribution, with ``stats`` holding the volume-weighted mean,
         median and modal diameters, the largest sphere found, and for
-        ``"packed"`` the sphere count and filling fraction.
+        ``"packed"`` the sphere count and packed cell fraction.
     """
     method = METHOD_ALIASES.get(method, method)
     if method not in METHODS:
@@ -564,7 +586,7 @@ def pore_size_distribution(
             "n_spheres": packing.n_spheres,
             "n_candidates": packing.n_candidates,
             "packed_volume_A3": packing.volume,
-            "filling_fraction": packing.filling_fraction(field.void_volume),
+            "packed_cell_fraction": packing.fraction_of(field.cell_volume),
         }
     else:
         if method == "covering":
@@ -591,7 +613,11 @@ def pore_size_distribution(
         weights = np.full(sizes.shape, voxel_volume, dtype=np.float64)
 
     centers, volume = bin_distribution(
-        sizes, weights, bin_width=bin_width, max_diameter=max_diameter
+        sizes,
+        weights,
+        bin_width=bin_width,
+        max_diameter=max_diameter,
+        allow_truncation=allow_truncation,
     )
     stats = _distribution_stats(centers, volume, sizes)
     stats.update(extra_stats)
@@ -651,6 +677,16 @@ def _packed_spheres(
             pore_ids=np.empty(0, dtype=np.int64),
         )
 
+    values = np.minimum(values, _packing_radius_caps(field, indices))
+    keep = np.isfinite(values) & (values > 0.0) & (values >= min_radius)
+    indices, values = indices[keep], values[keep]
+    if indices.shape[0] == 0:
+        return SpherePacking(
+            centers=np.empty((0, 3)),
+            radii=np.empty(0),
+            pore_ids=np.empty(0, dtype=np.int64),
+        )
+
     nx, ny, nz = field.grid.shape
     flat = indices[:, 0] * ny * nz + indices[:, 1] * nz + indices[:, 2]
     flat_t = torch.as_tensor(flat, device=field.clearance.device)
@@ -672,6 +708,31 @@ def _packed_spheres(
         pore_ids=pore_ids,
         overlap_tolerance=overlap_tolerance,
     )
+
+
+def _packing_radius_caps(field: DistanceField, indices: np.ndarray) -> np.ndarray:
+    """Largest radii compatible with the periodic cell and open boundaries."""
+    caps = np.full(indices.shape[0], np.inf, dtype=np.float64)
+    pbc = field.mic.pbc.detach().cpu().numpy().astype(bool)
+
+    if pbc.any():
+        ranges = [(-1, 0, 1) if periodic else (0,) for periodic in pbc]
+        offsets = np.asarray(list(product(*ranges)), dtype=np.float64)
+        offsets = offsets[np.any(offsets != 0.0, axis=1)]
+        reduced_cell = field.mic.rcell.detach().cpu().numpy().astype(np.float64)
+        translations = offsets @ reduced_cell
+        self_image_cap = 0.5 * float(np.linalg.norm(translations, axis=1).min())
+        caps = np.minimum(caps, self_image_cap)
+
+    if not pbc.all():
+        counts = np.asarray(field.grid.shape, dtype=np.float64)
+        fractional = (indices.astype(np.float64) + 0.5) / counts
+        widths = perpendicular_widths(field.grid.cell).detach().cpu().numpy()
+        face_distance = np.minimum(fractional, 1.0 - fractional) * widths
+        for axis in np.flatnonzero(~pbc):
+            caps = np.minimum(caps, face_distance[:, axis])
+
+    return caps
 
 
 def _distribution_stats(centers, volume, sizes) -> dict:

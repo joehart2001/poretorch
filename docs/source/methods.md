@@ -12,6 +12,8 @@ d(g) = min_i ( |g - r_i|_mic - R_i )
 where `R_i` is the radius of atom `i` and the displacement is taken under the
 minimum-image convention. `d(g)` is the radius of the largest empty sphere that
 can be centred at `g`. A point belongs to the void when `d(g) >= probe_radius`.
+This is a local fit test, not a reservoir-reachability calculation, so closed
+cavities are included.
 
 Grid points sit at voxel centres in fractional coordinates, so the voxels tile
 the cell exactly and each has volume `V_cell / (nx * ny * nz)` whatever the cell
@@ -27,7 +29,7 @@ point" means.
 |---|---|---|---|---|
 | `all_void` | overlapping | its own clearance | voxel volume | accessible void volume |
 | `covering` | overlapping | largest empty sphere anywhere that contains it | voxel volume | accessible void volume |
-| `packed` | non-overlapping | radius of the packed sphere it belongs to | sphere volume | packed volume |
+| `packed` | non-overlapping | accepted local-maximum radius | sphere volume | packed sphere volume |
 
 ### Overlapping spheres against packed spheres
 
@@ -41,18 +43,16 @@ applied, and none is needed.
 `packed` is the exception. Candidates are visited largest-first and one is
 accepted only if it clears every sphere accepted so far, under the minimum-image
 convention so the test holds across periodic boundaries. The accepted set is
-therefore **disjoint**. That makes the distribution a partition of the void
-rather than a smoothed local average, at the cost of the interstitial gaps a
-packing necessarily leaves.
+therefore **disjoint**. Candidate radii are capped to avoid overlap with their
+own periodic replicas or with open cell boundaries. The result is a discrete
+sphere-packing spectrum, not a partition of the void.
 
-Overlap decides which *size* a point is labelled with, not how much volume it
-contributes, so no method double-counts void volume. `all_void` and `covering`
-weight each void voxel by its own voxel volume, counted exactly once, so they
-integrate to the accessible void volume however much their spheres overlap.
-`packed` weights each sphere by its sphere volume, which is sound only because
-the spheres are disjoint, and integrates to the packed volume.
-`stats["filling_fraction"]` reports how far short of the void volume that falls,
-typically 0.2 to 0.3.
+For `all_void` and `covering`, overlap decides which *size* a point receives,
+not how much volume it contributes. Each included voxel carries its own voxel
+volume exactly once. `packed` instead weights each accepted sphere by its
+analytic volume, so its absolute scale is not directly comparable with the two
+voxel-weighted methods. `stats["packed_cell_fraction"]` reports packed sphere
+volume divided by cell volume.
 
 ### all_void (overlapping spheres)
 
@@ -87,16 +87,14 @@ since fewer candidates can only ever find a smaller covering sphere.
 
 ### packed (non-overlapping spheres)
 
-The void is filled greedily with non-overlapping inscribed spheres, largest
-first, and the distribution is taken over those spheres. No void volume is
-counted twice, so the distribution is a partition rather than a smoothed local
-average. The price is that packing leaves interstitial gaps, so the packed volume
-is always below the true void volume. `stats["filling_fraction"]` reports by how
-much.
+Inscribed spheres are considered greedily, largest first, and the distribution
+is taken over the accepted spheres. The spheres are disjoint but leave
+interstitial gaps, so this is a packing spectrum rather than a void-volume
+partition.
 
-Candidates are the local maxima of the clearance field. The pass is global
-rather than per pore, which makes the no-double-counting guarantee
-unconditional.
+Candidates are local maxima of the clearance field. The pass is global rather
+than per pore. Periodic self-image and open-boundary caps ensure the packing is
+valid within the simulation cell.
 
 ## Pores and percolation
 

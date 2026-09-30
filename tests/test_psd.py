@@ -105,11 +105,26 @@ def test_packed_spheres_do_not_overlap(cell, random_structure):
     assert (distance >= limit - 1e-9).all()
 
 
-def test_packed_volume_stays_below_the_void_volume(cell, random_structure):
+def test_packed_volume_stays_within_the_periodic_cell(cell, random_structure):
     field = _field(cell, random_structure(cell, n_atoms=30, seed=29))
     result = pore_size_distribution(field, method="packed", bin_width=0.2, min_radius=0.3)
-    assert 0.0 < result.stats["filling_fraction"] < 1.0
+    assert 0.0 < result.stats["packed_cell_fraction"] <= 1.0
     assert result.stats["n_spheres"] <= result.stats["n_candidates"]
+
+
+def test_packed_sphere_does_not_overlap_its_periodic_images():
+    """A sparse cell must not admit a sphere larger than half a lattice repeat."""
+    cell = np.diag([20.0, 20.0, 20.0])
+    field = _field(
+        cell,
+        np.zeros((1, 3)),
+        grid_spacing=0.5,
+        probe_radius="N2",
+    )
+    result = pore_size_distribution(field, method="packed", bin_width=0.2)
+
+    assert result.stats["max_diameter_A"] <= 20.0 + 1e-12
+    assert result.stats["packed_cell_fraction"] <= 1.0
 
 
 def test_every_packed_sphere_belongs_to_a_pore(cell, random_structure):
@@ -174,6 +189,20 @@ def test_binning_is_exact_for_known_input():
 def test_binning_rejects_a_non_positive_width():
     with pytest.raises(ValueError, match="bin_width must be"):
         bin_distribution([1.0], [1.0], bin_width=0.0)
+
+
+def test_binning_does_not_silently_truncate():
+    with pytest.raises(ValueError, match="allow_truncation=True"):
+        bin_distribution([2.0], [1.0], bin_width=0.5, max_diameter=3.0)
+
+    _, volume = bin_distribution(
+        [2.0],
+        [1.0],
+        bin_width=0.5,
+        max_diameter=3.0,
+        allow_truncation=True,
+    )
+    assert volume.sum() == 0.0
 
 
 def test_median_is_interpolated_not_snapped_to_a_bin():
