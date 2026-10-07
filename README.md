@@ -190,10 +190,11 @@ python -m pip install -e ".[docs]"
 sphinx-build -W --keep-going -b html docs/source docs/build/html
 ```
 
-Documentation is deployed to GitHub Pages by `.github/workflows/docs.yml` after
-each push to `main`. Enable it once under **Settings → Pages → Source: GitHub
-Actions**. The published site will be available at
-<https://joehart2001.github.io/poretorch/>.
+Documentation is published at <https://joehart2001.github.io/poretorch/>.
+The `.github/workflows/docs.yml` workflow checks documentation builds on pull
+requests and deploys after each push to `main`. It can also be run manually
+from the Actions tab. GitHub Pages uses **Settings → Pages → Source: GitHub
+Actions**.
 
 See [`docs/source/methods.md`](docs/source/methods.md) for the detailed method
 definitions and [`docs/source/api.md`](docs/source/api.md) for the API.

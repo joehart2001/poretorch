@@ -26,7 +26,7 @@ autodoc_mock_imports = [
     "tqdm",
 ]
 
-templates_path = ['_templates']
+templates_path = []
 exclude_patterns = []
 
 language = 'Python'
@@ -34,7 +34,7 @@ language = 'Python'
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = 'sphinx_rtd_theme'
-html_static_path = ['_static']
+html_static_path = []
 
 source_suffix = {
     ".rst": "restructuredtext",
