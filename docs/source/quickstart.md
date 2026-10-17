@@ -1,8 +1,16 @@
 # Quickstart
 
-Install for development:
+Install the latest release from PyPI:
 
+```bash
+pip install PoreTorch
 ```
+
+For development, clone the repository and install it in editable mode:
+
+```bash
+git clone https://github.com/joehart2001/poretorch.git
+cd poretorch
 pip install -e .
 ```
 
@@ -88,6 +96,8 @@ plot_psd(
 distribution:
 
 ```python
+from poretorch import analyse
+
 result = analyse(atoms, method="covering", probe_radius="N2")
 
 print(result.field.porosity)                     # local probe-fit void fraction
