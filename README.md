@@ -184,8 +184,7 @@ saving are included. PoreBlazer timings include its full calculation.
 | Method | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
 |---|---:|---:|---:|---:|
 | PoreBlazer CPU | 0.915 | 2.767 | 15.881 | 69.553 |
-| PoreTorch GPU · `all_void`, voxel | 4.160 | 3.059 | 3.168 | 3.608 |
-| PoreTorch GPU · `all_void`, sphere | 3.035 | 2.998 | 3.050 | 3.386 |
+| PoreTorch GPU · `all_void` | 4.160 | 3.059 | 3.168 | 3.608 |
 | PoreTorch GPU · `covering` | 3.573 | 3.793 | 9.636 | 44.121 |
 | PoreTorch GPU · `packed` | 7.901 | 3.160 | 3.334 | 3.434 |
 
@@ -193,8 +192,7 @@ saving are included. PoreBlazer timings include its full calculation.
 
 | Method | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
 |---|---:|---:|---:|---:|
-| PoreTorch GPU · `all_void`, voxel | 0.032 | 0.061 | 0.208 | 0.543 |
-| PoreTorch GPU · `all_void`, sphere | 0.025 | 0.063 | 0.209 | 0.545 |
+| PoreTorch GPU · `all_void` | 0.032 | 0.061 | 0.208 | 0.543 |
 | PoreTorch GPU · `covering` | 0.205 | 0.801 | 6.785 | 41.337 |
 | PoreTorch GPU · `packed` | 0.028 | 0.063 | 0.215 | 0.558 |
 

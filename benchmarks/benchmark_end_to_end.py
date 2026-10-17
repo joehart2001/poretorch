@@ -16,7 +16,7 @@ import sys
 import tempfile
 import time
 
-CONFIGS = [('all_void', 'voxel'), ('all_void', 'sphere'),
+CONFIGS = [('all_void', 'voxel'),
            ('covering', 'voxel'), ('packed', 'sphere')]
 
 

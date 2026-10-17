@@ -36,7 +36,8 @@ source hashes are saved with the inputs.
 
 PoreBlazer 4.0 samples 10,000 points. PoreTorch `covering` evaluates every void
 point and is the closest PSD definition. `all_void` and `packed` measure
-different distributions. PoreTorch uses float64 geometry.
+different distributions. `all_void` uses its default voxel weighting.
+PoreTorch uses float64 geometry.
 
 Measurements use a Ryzen 9 9950X (one CPU thread) and RTX 5090, PyTorch 2.8.0
 with CUDA 12.8, and GNU Fortran 13.3 with `-O2`.

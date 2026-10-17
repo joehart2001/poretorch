@@ -12,8 +12,7 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import LogLocator, ScalarFormatter
 
 METHODS = [
-    ('all_void', 'voxel', 'all_void · voxel', '#0072B2', 'o'),
-    ('all_void', 'sphere', 'all_void · sphere', '#56B4E9', 's'),
+    ('all_void', 'voxel', 'all_void', '#0072B2', 'o'),
     ('covering', 'voxel', 'covering', '#D55E00', 'D'),
     ('packed', 'sphere', 'packed', '#009E73', '^'),
 ]
