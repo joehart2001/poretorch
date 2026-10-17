@@ -622,7 +622,7 @@ def pore_size_distribution(
         max_diameter=max_diameter,
         allow_truncation=allow_truncation,
     )
-    stats = _distribution_stats(centers, volume, sizes)
+    stats = _distribution_stats(centers, volume, sizes, bin_width=bin_width)
     stats.update(extra_stats)
     stats["probe_radius_A"] = field.probe_radius
     stats["porosity"] = field.porosity
@@ -738,7 +738,7 @@ def _packing_radius_caps(field: DistanceField, indices: np.ndarray) -> np.ndarra
     return caps
 
 
-def _distribution_stats(centers, volume, sizes) -> dict:
+def _distribution_stats(centers, volume, sizes, bin_width: float) -> dict:
     """
     Summarise a binned distribution.
 
@@ -750,6 +750,8 @@ def _distribution_stats(centers, volume, sizes) -> dict:
         Volume per bin in cubic Angstrom.
     sizes
         The underlying radii, for exact extremes independent of binning.
+    bin_width
+        Diameter bin width, used to interpolate within the median's bin.
 
     Returns
     -------
@@ -771,17 +773,15 @@ def _distribution_stats(centers, volume, sizes) -> dict:
         return stats
 
     fraction = np.cumsum(volume) / total
-    # Interpolate the median across the bin it falls in rather than snapping to
-    # a bin centre, so it does not quantise with bin_width.
+    # Cumulative bin volumes live at upper bin edges, not bin centres.
+    # Interpolate assuming uniform volume density within the median's bin.
     index = int(np.searchsorted(fraction, 0.5))
     index = min(index, centers.size - 1)
-    if index == 0:
-        median = float(centers[0])
-    else:
-        f0, f1 = fraction[index - 1], fraction[index]
-        d0, d1 = centers[index - 1], centers[index]
-        weight = (0.5 - f0) / (f1 - f0) if f1 > f0 else 0.0
-        median = float(d0 + weight * (d1 - d0))
+    f0 = fraction[index - 1] if index else 0.0
+    f1 = fraction[index]
+    weight = (0.5 - f0) / (f1 - f0)
+    lower_edge = centers[index] - 0.5 * bin_width
+    median = float(lower_edge + weight * bin_width)
 
     stats.update(
         mean_diameter_A=float(np.average(centers, weights=volume)),

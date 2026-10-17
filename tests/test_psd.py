@@ -7,6 +7,7 @@ from poretorch.field import distance_field
 from poretorch.labels import label_pores
 from poretorch.psd import (
     PSD,
+    _distribution_stats,
     bin_distribution,
     covering_sizes,
     pore_size_distribution,
@@ -236,3 +237,20 @@ def test_median_is_interpolated_not_snapped_to_a_bin():
     assert coarse.stats["median_diameter_A"] == pytest.approx(
         fine.stats["median_diameter_A"], abs=0.5
     )
+
+
+@pytest.mark.parametrize('bin_width', [0.25, 1.0])
+@pytest.mark.parametrize('volumes, median_in_bins', [
+    ([0., 0., 1.], 2.5),
+    ([1.], 0.5),
+    ([4., 1.], 0.625),
+    ([0., 3., 1.], 1.0 + 2.0 / 3.0),
+    ([1., 1.], 1.0),
+    ([0.], 0.0),
+])
+def test_median_interpolates_between_bin_edges(bin_width, volumes, median_in_bins):
+    volumes = np.asarray(volumes)
+    centers = (np.arange(len(volumes)) + 0.5) * bin_width
+    sizes = centers[volumes > 0] / 2.0
+    stats = _distribution_stats(centers, volumes, sizes, bin_width=bin_width)
+    assert stats['median_diameter_A'] == pytest.approx(median_in_bins * bin_width)
