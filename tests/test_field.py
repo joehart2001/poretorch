@@ -147,3 +147,15 @@ def test_auto_device_selects_an_available_backend():
     expected = "cuda" if torch.cuda.is_available() else "cpu"
     assert _resolve_device("auto").type == expected
     assert _resolve_device(None).type == expected
+
+
+def test_skewed_wire_clearance_matches_analytic_periodic_distance():
+    field = distance_field(
+        [[0., 0., 0.]], [[1., 0., 0.], [10., 1., 0.], [0., 0., 10.]],
+        pbc=(True, False, False), radii=0.1, grid_spacing=0.5,
+        method='brute', device='cpu', torch_dtype=torch.float64,
+    )
+    coords = field.grid.coordinates().numpy()
+    coords[:, 0] = (coords[:, 0] + 0.5) % 1.0 - 0.5
+    expected = np.linalg.norm(coords, axis=1) - 0.1
+    assert np.allclose(field.clearance.numpy().ravel(), expected, atol=1e-10)

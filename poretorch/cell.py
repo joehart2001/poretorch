@@ -169,6 +169,9 @@ class MinimumImage:
         Boolean periodicity flags shaped ``(3,)``.
     orthogonal
         Whether ``rcell`` is orthogonal.
+    periodic_inv
+        Projection onto the periodic basis for mixed boundary conditions.
+        Unlike ``rcell_inv``, it is independent of the open cell vectors.
     """
 
     rcell: Tensor
@@ -176,6 +179,7 @@ class MinimumImage:
     shifts: Tensor
     pbc: Tensor
     orthogonal: bool
+    periodic_inv: Tensor | None = None
 
 
 def minimum_image_setup(cell: Tensor, pbc: Tensor) -> MinimumImage:
@@ -205,6 +209,15 @@ def minimum_image_setup(cell: Tensor, pbc: Tensor) -> MinimumImage:
     rcell = torch.as_tensor(np.asarray(rcell_np, dtype=np.float64), device=device, dtype=dtype)
     rcell_inv = torch.linalg.inv(rcell)
 
+    periodic_inv = None
+    if pbc_np.any() and not pbc_np.all():
+        # Open vectors may have arbitrarily large components along the periodic
+        # subspace. Project onto that subspace before choosing lattice images.
+        # Keep the full inverse above for spatial binning in the original cell.
+        projection = np.zeros((3, 3), dtype=np.float64)
+        projection[:, pbc_np] = np.linalg.pinv(np.asarray(rcell_np)[pbc_np])
+        periodic_inv = torch.as_tensor(projection, device=device, dtype=dtype)
+
     orthogonal = is_orthogonal(rcell)
     if orthogonal:
         # The fractional wrap alone already yields the shortest vector.
@@ -221,6 +234,7 @@ def minimum_image_setup(cell: Tensor, pbc: Tensor) -> MinimumImage:
         shifts=shifts,
         pbc=pbc,
         orthogonal=orthogonal,
+        periodic_inv=periodic_inv,
     )
 
 
@@ -240,10 +254,14 @@ def mic_distance(delta: Tensor, mic: MinimumImage) -> Tensor:
     Tensor
         Minimum-image distances shaped ``delta.shape[:-1]``.
     """
-    frac = delta @ mic.rcell_inv
-    # Wrap only along periodic axes. Open axes keep their raw separation.
-    wrapped = frac - torch.round(frac) * mic.pbc
-    base = wrapped @ mic.rcell
+    if mic.periodic_inv is not None:
+        frac = delta @ mic.periodic_inv
+        base = delta - (torch.round(frac) * mic.pbc) @ mic.rcell
+    else:
+        frac = delta @ mic.rcell_inv
+        # Wrap only along periodic axes. Open axes keep their raw separation.
+        wrapped = frac - torch.round(frac) * mic.pbc
+        base = wrapped @ mic.rcell
 
     if mic.orthogonal:
         return base.norm(dim=-1)

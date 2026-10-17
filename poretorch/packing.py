@@ -198,6 +198,10 @@ def _mic_to(mic: MinimumImage, device, dtype) -> MinimumImage:
         shifts=mic.shifts.to(device=device, dtype=dtype),
         pbc=mic.pbc.to(device=device),
         orthogonal=mic.orthogonal,
+        periodic_inv=(
+            None if mic.periodic_inv is None
+            else mic.periodic_inv.to(device=device, dtype=dtype)
+        ),
     )
 
 

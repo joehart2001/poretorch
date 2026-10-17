@@ -1,3 +1,5 @@
+from itertools import product
+
 import numpy as np
 import pytest
 import torch
@@ -97,3 +99,29 @@ def test_orthogonal_cell_skips_the_image_search():
     _, skewed = _setup(np.array([[5.0, 0, 0], [4.0, 5.0, 0], [3.0, 2.0, 5.0]]))
     assert ortho.orthogonal and ortho.shifts.shape[0] == 1
     assert not skewed.orthogonal and skewed.shifts.shape[0] == 27
+
+
+def test_mixed_pbc_skew_does_not_lengthen_open_displacement():
+    _, mic = _setup([[1, 0, 0], [10, 1, 0], [0, 0, 10]], pbc=(True, False, False))
+    delta = torch.tensor([[0.0, 1.0, 0.0]], dtype=torch.float64)
+    assert mic_distance(delta, mic).item() == pytest.approx(1.0)
+
+
+@pytest.mark.parametrize('n_periodic', [1, 2])
+@pytest.mark.parametrize('permutation', [(0, 1, 2), (2, 0, 1), (1, 2, 0)])
+def test_mixed_pbc_matches_explicit_periodic_images(n_periodic, permutation):
+    rng = np.random.default_rng(39)
+    rotation, _ = np.linalg.qr(rng.normal(size=(3, 3)))
+    cell = np.array([[2., 0., 0.], [.8, 1., 0.], [20., 15., 2.]])
+    cell = cell[list(permutation)] @ rotation
+    pbc = (np.arange(3) < n_periodic)[list(permutation)]
+    _, mic = _setup(cell, pbc=pbc)
+    vectors = rng.uniform(-5, 5, size=(32, 3)) @ rotation
+    offsets = np.array(list(product(*[range(-12, 13) if p else [0] for p in pbc])))
+    reference = np.linalg.norm(vectors[:, None, :] + offsets @ cell, axis=-1).min(axis=1)
+    assert np.allclose(mic_distance(torch.as_tensor(vectors), mic), reference, atol=1e-10)
+
+    # Sphere packing transfers this setup to CPU float64 before using it.
+    from poretorch.packing import _mic_to
+    converted = _mic_to(mic, 'cpu', torch.float32)
+    assert np.allclose(mic_distance(torch.as_tensor(vectors, dtype=torch.float32), converted), reference, atol=1e-5)
