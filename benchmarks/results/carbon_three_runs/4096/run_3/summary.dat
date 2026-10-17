@@ -1,0 +1,31 @@
+ atoms.extxyz
+V_A^3    81722.684
+M _g/mol    49197.056
+RHO_g/cm^3        1.000
+PLD_A         7.65
+LCD_A        16.42
+ D            1
+ Total               
+S_AC_A^2     20412.83
+S_AC_m^2/cm^3      2497.82
+S_AC_m^2/g      2498.71
+ Total               
+V_He_A^3    68251.893
+V_He_cm^3/g        0.835
+V_G_A^3    48141.205
+V_G cm^3/g:        0.589
+V_PO A^3:    48141.205
+V_PO cm^3/g:        0.589
+FV_PO:      0.58908
+ Network-accessible  
+S_AC_A^2     20356.50
+S_AC_m^2/cm^3      2490.92
+S_AC_m^2/g      2491.81
+ Network-accessible  
+V_He_A^3    68251.893
+V_He_cm^3/g        0.835
+V_G_A^3    48130.284
+V_G cm^3/g:        0.589
+V_PO A^3:    48130.284
+V_PO cm^3/g:        0.589
+FV_PO:      0.58895

@@ -1,10 +1,11 @@
-"""Measure time to a saved PSD for PoreBlazer and PoreTorch."""
+"""Benchmark PoreBlazer and PoreTorch on carbon structures."""
 from __future__ import annotations
 
 import argparse
 import csv
 from datetime import datetime, timezone
 import hashlib
+import itertools
 import json
 import os
 from pathlib import Path
@@ -22,13 +23,11 @@ CONFIGS = [('all_void', 'voxel'),
 
 def worker(args):
     """An ordinary PoreTorch script: public API, input reading and CSV output."""
-    start = time.perf_counter()
     import torch
     from poretorch import psd
 
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
-    imports = time.perf_counter() - start
 
     def calculate():
         begin = time.perf_counter()
@@ -45,10 +44,9 @@ def worker(args):
         elapsed = time.perf_counter() - begin
         return elapsed, result
 
-    first, result = calculate()
+    _, result = calculate()
     warmed = [calculate()[0] for _ in range(args.warm_runs)]
-    print(json.dumps(dict(import_seconds=imports, first_call_seconds=first,
-        warm_call_seconds=warmed, torch=torch.__version__, cuda=torch.version.cuda,
+    print(json.dumps(dict(seconds=warmed, torch=torch.__version__, cuda=torch.version.cuda,
         gpu=torch.cuda.get_device_name(0) if args.device == 'cuda' else None,
         total_void_volume_A3=result.total_void_volume_A3)), flush=True)
 
@@ -85,9 +83,49 @@ def prepare(case, target):
         shutil.copy2(case / name, target / name)
 
 
+TIMING_FIELDS = ('seconds',)
+GROUP_FIELDS = ('code', 'device', 'method', 'weighting', 'n_atoms')
+SUMMARY_FIELDS = (*GROUP_FIELDS, 'n_structures', *TIMING_FIELDS,
+                  *(field + '_std' for field in TIMING_FIELDS))
+
+
+def aggregate_timings(rows, run_ids):
+    """Mean and sample SD of per-structure medians, for complete groups only."""
+    expected = set(run_ids)
+    if not expected or len(expected) != len(run_ids):
+        raise ValueError('run IDs must be nonempty and unique')
+    groups = {}
+    for row in rows:
+        key = tuple(row[field] for field in GROUP_FIELDS)
+        group = groups.setdefault(key, {})
+        run_id = int(row['run_id'])
+        if run_id not in expected or run_id in group:
+            raise ValueError('unexpected or duplicate structure run')
+        group[run_id] = row
+    result = []
+    for key, group in groups.items():
+        if set(group) != expected:
+            continue
+        summary = dict(zip(GROUP_FIELDS, key))
+        summary['n_structures'] = len(group)
+        for field in TIMING_FIELDS:
+            values = [group[run_id][field] for run_id in run_ids]
+            if all(value == '' for value in values):
+                summary[field] = summary[field + '_std'] = ''
+            elif any(value == '' for value in values):
+                raise ValueError('inconsistent timing availability across structures')
+            else:
+                values = [float(value) for value in values]
+                summary[field] = statistics.mean(values)
+                summary[field + '_std'] = statistics.stdev(values) if len(values) > 1 else 0.
+        result.append(summary)
+    return result
+
+
 def main(args):
     import numpy as np
 
+    aggregate_timings([], args.runs)
     if args.repeats < 1:
         raise ValueError('repeats must be positive')
     root = Path(__file__).resolve().parents[1]
@@ -101,20 +139,41 @@ def main(args):
         poreblazer_commit=subprocess.check_output(
             ['git', '-C', str(args.poreblazer_src), 'rev-parse', 'HEAD'], text=True).strip(),
         cpu=next(line.split(':', 1)[1].strip() for line in Path('/proc/cpuinfo').read_text().splitlines() if line.startswith('model name')),
-        cpu_threads=1, repeats=args.repeats, sizes=args.sizes,
+        cpu_threads=1, repeats=args.repeats, sizes=args.sizes, runs=args.runs,
         devices=args.devices, cpu_max_atoms=args.cpu_max_atoms,
-        timing='median process launch to successful exit with saved PSD',
-        fresh_process_note='Fresh interpreter/CUDA context each run; filesystem caches are not flushed.',
+        timing=f'mean across structure runs of each structure\'s {args.repeats}-repeat median',
+        variation='sample standard deviation across per-structure medians',
         excluded='Installation, compilation, common input preparation, loading the output into a plotter, and plotting.',
-        warm_note='Public psd() in an already-imported Python process: input read, field, labels, PSD, CSV write, synchronization.',
+        warm_note='PoreTorch calls after one warm-up, including input reading, calculation and saving.',
         input_dataset=str(dataset), parameters=json.loads((dataset/'metadata.json').read_text()))
     rows, raw, comparisons = [], [], []
+    previous = None
+    if args.resume:
+        previous = json.loads((output/'metadata.json').read_text())
+        for key in ('parameters', 'repeats', 'poreblazer_commit', 'devices', 'sizes', 'runs'):
+            if previous[key] != metadata[key]:
+                raise ValueError(f'cannot resume with different {key}')
+        with (output/'per_structure_timings.csv').open() as f:
+            rows = list(csv.DictReader(f))
+        for row in rows:
+            row['n_atoms'] = int(row['n_atoms'])
+            row['run_id'] = int(row['run_id'])
+        raw = json.loads((output/'raw_timings.json').read_text())
+        comparisons = json.loads((output/'comparison.json').read_text())
+        metadata['previous_batches'] = previous.get('previous_batches', []) + [
+            dict(timestamp_utc=previous['timestamp_utc'], reused_records=len(rows))]
+    completed = {(r['code'], r['device'], r['method'], r['weighting'],
+                  int(r['n_atoms']), int(r['run_id'])) for r in rows}
 
     def save():
-        with (output / 'timings.csv').open('w') as f:
+        with (output / 'per_structure_timings.csv').open('w') as f:
             writer = csv.DictWriter(f, fieldnames=list(rows[0]))
             writer.writeheader()
             writer.writerows(rows)
+        with (output / 'timings.csv').open('w') as f:
+            writer = csv.DictWriter(f, fieldnames=SUMMARY_FIELDS)
+            writer.writeheader()
+            writer.writerows(aggregate_timings(rows, args.runs))
         (output / 'raw_timings.json').write_text(json.dumps(raw, indent=2)+'\n')
         (output / 'metadata.json').write_text(json.dumps(metadata, indent=2)+'\n')
         (output / 'comparison.json').write_text(json.dumps(comparisons, indent=2)+'\n')
@@ -123,55 +182,53 @@ def main(args):
         temporary = Path(temporary)
         exe, hashes = build_poreblazer(args.poreblazer_src.resolve(), temporary/'poreblazer', output)
         metadata['source_sha256'] = hashes
-        for n in args.sizes:
-            case = dataset/str(n)
-            inputs = output/str(n)/'inputs'
+        if previous is not None and previous['source_sha256'] != hashes:
+            raise ValueError('cannot resume with different PoreBlazer sources')
+        for n, run_id in itertools.product(args.sizes, args.runs):
+            case = dataset/str(n)/f'run_{run_id}'
+            case_output = output/str(n)/f'run_{run_id}'
+            inputs = case_output/'inputs'
             prepare(case, inputs)
             grid = json.loads((case/'grid.json').read_text())
-            print(f'{n} atoms: PoreBlazer, {args.repeats} complete fresh runs', flush=True)
-            pb_times = []
-            pb_curves = []
-            for repeat in range(args.repeats):
-                run = temporary/f'pb-{n}-{repeat}'
-                shutil.copytree(inputs, run)
-                with (output/str(n)/f'poreblazer_{repeat}.log').open('w') as log:
-                    start = time.perf_counter()
-                    subprocess.run([str(exe), 'input.dat'], cwd=run, env=env,
-                                   stdout=log, stderr=subprocess.STDOUT, check=True, timeout=args.timeout)
-                    pb_times.append(time.perf_counter()-start)
-                # Check saved plots are ready only after the stopwatch stops.
-                curve = np.loadtxt(run/'Total_psd_cumulative.txt')
-                assert np.isfinite(curve).all()
-                pb_curves.append(curve)
-                for name in ('Total_psd.txt', 'Total_psd_cumulative.txt',
-                             'Network-accessible_psd.txt', 'summary.dat'):
-                    shutil.copy2(run/name, output/str(n)/name)
-            for curve in pb_curves[1:]:
-                np.testing.assert_array_equal(curve, pb_curves[0])
-            rows.append(dict(code='PoreBlazer', device='cpu', method='full', weighting='voxel',
-                n_atoms=n, launch_to_saved_psd_seconds=statistics.median(pb_times),
-                warm_session_to_saved_psd_seconds=''))
-            raw.append(dict(code='PoreBlazer', n_atoms=n, launch_seconds=pb_times))
-            save()
+            if ('PoreBlazer', 'cpu', 'full', 'voxel', n, run_id) not in completed:
+                print(f'{n} atoms, run {run_id}: PoreBlazer, {args.repeats} repeats', flush=True)
+                pb_times = []
+                pb_curves = []
+                for repeat in range(args.repeats):
+                    run = temporary/f'pb-{n}-{run_id}-{repeat}'
+                    shutil.copytree(inputs, run)
+                    with (case_output/f'poreblazer_{repeat}.log').open('w') as log:
+                        start = time.perf_counter()
+                        subprocess.run([str(exe), 'input.dat'], cwd=run, env=env,
+                                       stdout=log, stderr=subprocess.STDOUT, check=True, timeout=args.timeout)
+                        pb_times.append(time.perf_counter()-start)
+                    # Check saved plots are ready only after the stopwatch stops.
+                    curve = np.loadtxt(run/'Total_psd_cumulative.txt')
+                    assert np.isfinite(curve).all()
+                    pb_curves.append(curve)
+                    for name in ('Total_psd.txt', 'Total_psd_cumulative.txt',
+                                 'Network-accessible_psd.txt', 'summary.dat'):
+                        shutil.copy2(run/name, case_output/name)
+                for curve in pb_curves[1:]:
+                    np.testing.assert_array_equal(curve, pb_curves[0])
+                rows.append(dict(code='PoreBlazer', device='cpu', method='full', weighting='voxel',
+                    n_atoms=n, run_id=run_id, seconds=statistics.median(pb_times)))
+                raw.append(dict(code='PoreBlazer', device='cpu', method='full', weighting='voxel',
+                    n_atoms=n, run_id=run_id, seconds=pb_times))
+                save()
+            pb_curve = np.loadtxt(case_output/'Total_psd_cumulative.txt')
             for device in args.devices:
                 if device == 'cpu' and n > args.cpu_max_atoms:
                     continue
                 for method, weighting in CONFIGS:
-                    print(f'{n} atoms: PoreTorch {device} {method}/{weighting}, fresh + warm', flush=True)
-                    csv_path = output/str(n)/f'{device}_{method}_{weighting}.csv'
+                    if ('PoreTorch', device, method, weighting, n, run_id) in completed:
+                        continue
+                    print(f'{n} atoms, run {run_id}: PoreTorch {device} {method}/{weighting}, warm start', flush=True)
+                    csv_path = case_output/f'{device}_{method}_{weighting}.csv'
                     command = [sys.executable, '-m', 'benchmarks.benchmark_end_to_end', '--worker',
                         '--input', str(inputs/'atoms.extxyz'), '--psd-output', str(csv_path),
                         '--spacing', str(grid['poretorch_requested_spacing_A']),
                         '--device', device, '--method', method, '--weighting', weighting]
-                    wall_times, worker_records = [], []
-                    for repeat in range(args.repeats):
-                        csv_path.unlink(missing_ok=True)
-                        start = time.perf_counter()
-                        proc = subprocess.run(command, cwd=root, env=env, capture_output=True,
-                                              text=True, check=True, timeout=args.timeout)
-                        wall_times.append(time.perf_counter()-start)
-                        worker_records.append(json.loads(proc.stdout))
-                        assert csv_path.is_file()
                     warm = subprocess.run(command+['--warm-runs', str(args.repeats)],
                         cwd=root, env=env, capture_output=True, text=True, check=True,
                         timeout=args.timeout*(args.repeats+1))
@@ -180,24 +237,22 @@ def main(args):
                     assert np.isfinite(table).all()
                     np.testing.assert_allclose(table[-1, 3], 1., atol=1e-10)
                     if device == 'cuda' and 'cpu' in args.devices and n <= args.cpu_max_atoms:
-                        cpu = np.loadtxt(output/str(n)/f'cpu_{method}_{weighting}.csv',
+                        cpu = np.loadtxt(case_output/f'cpu_{method}_{weighting}.csv',
                                          delimiter=',', skiprows=1)
                         np.testing.assert_allclose(table, cpu, rtol=1e-8, atol=1e-8)
                     if method == 'covering':
                         survival = np.r_[1., 1.-table[:,3]][:-1]
-                        comparisons.append(dict(n_atoms=n, device=device,
-                            max_survival_difference=float(np.max(abs(survival-pb_curves[0][:,1])))))
+                        comparisons.append(dict(n_atoms=n, run_id=run_id, device=device,
+                            max_survival_difference=float(np.max(abs(survival-pb_curve[:,1])))))
                     metadata.update(torch=warm_record['torch'], cuda=warm_record['cuda'])
                     if warm_record['gpu']:
                         metadata['gpu'] = warm_record['gpu']
                     rows.append(dict(code='PoreTorch', device=device, method=method, weighting=weighting,
-                        n_atoms=n, launch_to_saved_psd_seconds=statistics.median(wall_times),
-                        warm_session_to_saved_psd_seconds=statistics.median(warm_record['warm_call_seconds'])))
+                        n_atoms=n, run_id=run_id, seconds=statistics.median(warm_record['seconds'])))
                     raw.append(dict(code='PoreTorch', device=device, method=method, weighting=weighting,
-                        n_atoms=n, launch_seconds=wall_times, worker_records=worker_records,
-                        warm_process=warm_record))
+                        n_atoms=n, run_id=run_id, seconds=warm_record['seconds'], worker=warm_record))
                     save()
-    print(f'Wrote end-to-end results to {output}', flush=True)
+    print(f'Wrote benchmark results to {output}', flush=True)
 
 
 if __name__ == '__main__':
@@ -211,9 +266,11 @@ if __name__ == '__main__':
     parser.add_argument('--weighting', choices=['voxel', 'sphere'])
     parser.add_argument('--warm-runs', type=int, default=0)
     parser.add_argument('--poreblazer-src', type=Path)
-    parser.add_argument('--dataset', type=Path, default=Path('benchmarks/inputs/carbon'))
-    parser.add_argument('--output', type=Path, default=Path('benchmarks/results/carbon_end_to_end'))
+    parser.add_argument('--dataset', type=Path, default=Path('benchmarks/inputs/carbon_runs'))
+    parser.add_argument('--output', type=Path, default=Path('benchmarks/results/carbon_three_runs'))
     parser.add_argument('--sizes', nargs='+', type=int, default=[216, 512, 1728, 4096])
+    parser.add_argument('--runs', nargs='+', type=int, default=[1, 2, 3])
+    parser.add_argument('--resume', action='store_true', help='Reuse completed per-structure measurements')
     parser.add_argument('--devices', nargs='+', choices=['cpu', 'cuda'], default=['cuda'])
     parser.add_argument('--cpu-max-atoms', type=int, default=512,
                         help='Run PoreTorch CPU methods only up to this size')

@@ -1,0 +1,11 @@
+{
+  "shape": [
+    44,
+    44,
+    44
+  ],
+  "requested_spacing_A": 0.5,
+  "poreblazer_requested_spacing_A": 0.49313391178233273,
+  "actual_spacing_A": 0.49313391178233273,
+  "poretorch_requested_spacing_A": 0.4931339117828259
+}

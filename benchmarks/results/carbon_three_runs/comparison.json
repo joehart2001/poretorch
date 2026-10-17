@@ -1,0 +1,74 @@
+[
+  {
+    "n_atoms": 216,
+    "device": "cuda",
+    "max_survival_difference": 0.007965157029326986,
+    "run_id": 1
+  },
+  {
+    "n_atoms": 512,
+    "device": "cuda",
+    "max_survival_difference": 0.007480454551568871,
+    "run_id": 1
+  },
+  {
+    "n_atoms": 1728,
+    "device": "cuda",
+    "max_survival_difference": 0.004564152606122751,
+    "run_id": 1
+  },
+  {
+    "n_atoms": 4096,
+    "device": "cuda",
+    "max_survival_difference": 0.00884333469144899,
+    "run_id": 1
+  },
+  {
+    "n_atoms": 216,
+    "run_id": 2,
+    "device": "cuda",
+    "max_survival_difference": 0.009370232145300528
+  },
+  {
+    "n_atoms": 216,
+    "run_id": 3,
+    "device": "cuda",
+    "max_survival_difference": 0.007304710903053402
+  },
+  {
+    "n_atoms": 512,
+    "run_id": 2,
+    "device": "cuda",
+    "max_survival_difference": 0.014287090810381264
+  },
+  {
+    "n_atoms": 512,
+    "run_id": 3,
+    "device": "cuda",
+    "max_survival_difference": 0.008669859399636493
+  },
+  {
+    "n_atoms": 1728,
+    "run_id": 2,
+    "device": "cuda",
+    "max_survival_difference": 0.0050401390580488425
+  },
+  {
+    "n_atoms": 1728,
+    "run_id": 3,
+    "device": "cuda",
+    "max_survival_difference": 0.003160070767541101
+  },
+  {
+    "n_atoms": 4096,
+    "run_id": 2,
+    "device": "cuda",
+    "max_survival_difference": 0.009250343593748322
+  },
+  {
+    "n_atoms": 4096,
+    "run_id": 3,
+    "device": "cuda",
+    "max_survival_difference": 0.005162786847691392
+  }
+]

@@ -1,0 +1,1022 @@
+[
+  {
+    "code": "PoreBlazer",
+    "n_atoms": 216,
+    "run_id": 1,
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "seconds": [
+      0.9147054711356759,
+      0.9150242661125958,
+      0.9148527849465609
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "seconds": [
+      0.031881982926279306,
+      0.026746122166514397,
+      0.03444231627508998
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2563.8195427676,
+      "seconds": [
+        0.031881982926279306,
+        0.026746122166514397,
+        0.03444231627508998
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "seconds": [
+      0.2046176171861589,
+      0.20768977282568812,
+      0.20391571940854192
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2563.8195427676,
+      "seconds": [
+        0.2046176171861589,
+        0.20768977282568812,
+        0.20391571940854192
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "seconds": [
+      0.03190692886710167,
+      0.027586025651544333,
+      0.027691852767020464
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2563.8195427676,
+      "seconds": [
+        0.03190692886710167,
+        0.027586025651544333,
+        0.027691852767020464
+      ]
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "n_atoms": 512,
+    "run_id": 1,
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "seconds": [
+      2.7665158440358937,
+      2.766678946558386,
+      2.7665269412100315
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 512,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "seconds": [
+      0.06125131994485855,
+      0.06072013871744275,
+      0.06064498005434871
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 6038.493216950268,
+      "seconds": [
+        0.06125131994485855,
+        0.06072013871744275,
+        0.06064498005434871
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 512,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "seconds": [
+      0.802604234777391,
+      0.8012607418932021,
+      0.8008847609162331
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 6038.493216950268,
+      "seconds": [
+        0.802604234777391,
+        0.8012607418932021,
+        0.8008847609162331
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 512,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "seconds": [
+      0.06360174994915724,
+      0.06300173187628388,
+      0.06300846533849835
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 6038.493216950268,
+      "seconds": [
+        0.06360174994915724,
+        0.06300173187628388,
+        0.06300846533849835
+      ]
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "n_atoms": 1728,
+    "run_id": 1,
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "seconds": [
+      15.881349178031087,
+      16.032358098309487,
+      15.832127884030342
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 1728,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "seconds": [
+      0.20844521187245846,
+      0.20804790128022432,
+      0.20797709934413433
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20306.668918951716,
+      "seconds": [
+        0.20844521187245846,
+        0.20804790128022432,
+        0.20797709934413433
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 1728,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "seconds": [
+      6.7845648298971355,
+      6.784630504902452,
+      6.780966441147029
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20306.668918951716,
+      "seconds": [
+        6.7845648298971355,
+        6.784630504902452,
+        6.780966441147029
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 1728,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "seconds": [
+      0.21353466622531414,
+      0.21527173276990652,
+      0.21541596297174692
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20306.668918951716,
+      "seconds": [
+        0.21353466622531414,
+        0.21527173276990652,
+        0.21541596297174692
+      ]
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "n_atoms": 4096,
+    "run_id": 1,
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "seconds": [
+      69.40297403698787,
+      69.55289578670636,
+      69.95046005398035
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 4096,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "seconds": [
+      0.5436444147489965,
+      0.5430566291324794,
+      0.5432847049087286
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48162.55130854721,
+      "seconds": [
+        0.5436444147489965,
+        0.5430566291324794,
+        0.5432847049087286
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 4096,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "seconds": [
+      41.33567600464448,
+      41.33741625305265,
+      41.37026586383581
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48162.55130854721,
+      "seconds": [
+        41.33567600464448,
+        41.33741625305265,
+        41.37026586383581
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 4096,
+    "run_id": 1,
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "seconds": [
+      0.5608723186887801,
+      0.5575122646987438,
+      0.5569857638329268
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48162.55130854721,
+      "seconds": [
+        0.5608723186887801,
+        0.5575122646987438,
+        0.5569857638329268
+      ]
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "n_atoms": 216,
+    "run_id": 2,
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "seconds": [
+      0.7144129760563374,
+      0.7145264870487154,
+      0.7146015767939389
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 2,
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "seconds": [
+      0.027287163771688938,
+      0.026724135037511587,
+      0.02657613903284073
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2531.8605733979207,
+      "seconds": [
+        0.027287163771688938,
+        0.026724135037511587,
+        0.02657613903284073
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 2,
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "seconds": [
+      0.1792390630580485,
+      0.17887037619948387,
+      0.1787274801172316
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2531.8605733979207,
+      "seconds": [
+        0.1792390630580485,
+        0.17887037619948387,
+        0.1787274801172316
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 2,
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "seconds": [
+      0.028980229049921036,
+      0.029335131403058767,
+      0.028215574100613594
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2531.8605733979207,
+      "seconds": [
+        0.028980229049921036,
+        0.029335131403058767,
+        0.028215574100613594
+      ]
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "n_atoms": 216,
+    "run_id": 3,
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "seconds": [
+      1.0650181118398905,
+      1.0651118569076061,
+      1.0651254332624376
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 3,
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "seconds": [
+      0.02708198083564639,
+      0.026461123023182154,
+      0.026457406114786863
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2532.2551285753243,
+      "seconds": [
+        0.02708198083564639,
+        0.026461123023182154,
+        0.026457406114786863
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "n_atoms": 216,
+    "run_id": 3,
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "seconds": [
+      0.20194152975454926,
+      0.20120143005624413,
+      0.20094284787774086
+    ],
+    "worker": {
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2532.2551285753243,
+      "seconds": [
+        0.20194152975454926,
+        0.20120143005624413,
+        0.20094284787774086
+      ]
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 216,
+    "run_id": 3,
+    "seconds": [
+      0.02784097706899047,
+      0.02746022818610072,
+      0.02722646202892065
+    ],
+    "worker": {
+      "seconds": [
+        0.02784097706899047,
+        0.02746022818610072,
+        0.02722646202892065
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 2532.2551285753243
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 512,
+    "run_id": 2,
+    "seconds": [
+      2.9172479598782957,
+      2.967212377116084,
+      2.917119258083403
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 512,
+    "run_id": 2,
+    "seconds": [
+      0.06197458505630493,
+      0.06141026318073273,
+      0.06160949496552348
+    ],
+    "worker": {
+      "seconds": [
+        0.06197458505630493,
+        0.06141026318073273,
+        0.06160949496552348
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 5985.248370695235
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 512,
+    "run_id": 2,
+    "seconds": [
+      0.8322266042232513,
+      0.8318632571026683,
+      0.8316071089357138
+    ],
+    "worker": {
+      "seconds": [
+        0.8322266042232513,
+        0.8318632571026683,
+        0.8316071089357138
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 5985.248370695235
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 512,
+    "run_id": 2,
+    "seconds": [
+      0.0639151930809021,
+      0.06380404578521848,
+      0.06353574618697166
+    ],
+    "worker": {
+      "seconds": [
+        0.0639151930809021,
+        0.06380404578521848,
+        0.06353574618697166
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 5985.248370695235
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 512,
+    "run_id": 3,
+    "seconds": [
+      3.3179151341319084,
+      3.3675178759731352,
+      3.367889467161149
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 512,
+    "run_id": 3,
+    "seconds": [
+      0.05814423505216837,
+      0.05792171973735094,
+      0.05808204924687743
+    ],
+    "worker": {
+      "seconds": [
+        0.05814423505216837,
+        0.05792171973735094,
+        0.05808204924687743
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 6037.533850351078
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 512,
+    "run_id": 3,
+    "seconds": [
+      0.9041038048453629,
+      0.9044829523190856,
+      0.9042395381256938
+    ],
+    "worker": {
+      "seconds": [
+        0.9041038048453629,
+        0.9044829523190856,
+        0.9042395381256938
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 6037.533850351078
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 512,
+    "run_id": 3,
+    "seconds": [
+      0.06152322422713041,
+      0.05929048219695687,
+      0.05989523930475116
+    ],
+    "worker": {
+      "seconds": [
+        0.06152322422713041,
+        0.05929048219695687,
+        0.05989523930475116
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 6037.533850351078
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 1728,
+    "run_id": 2,
+    "seconds": [
+      16.185413212981075,
+      16.233661528211087,
+      16.231441698037088
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 1728,
+    "run_id": 2,
+    "seconds": [
+      0.28683634102344513,
+      0.2308242409490049,
+      0.23058101814240217
+    ],
+    "worker": {
+      "seconds": [
+        0.28683634102344513,
+        0.2308242409490049,
+        0.23058101814240217
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20311.062861643124
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 1728,
+    "run_id": 2,
+    "seconds": [
+      7.695847298018634,
+      7.705171880777925,
+      7.705306231975555
+    ],
+    "worker": {
+      "seconds": [
+        7.695847298018634,
+        7.705171880777925,
+        7.705306231975555
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20311.062861643124
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 1728,
+    "run_id": 2,
+    "seconds": [
+      0.23357165092602372,
+      0.23336657788604498,
+      0.23315327102318406
+    ],
+    "worker": {
+      "seconds": [
+        0.23357165092602372,
+        0.23336657788604498,
+        0.23315327102318406
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20311.062861643124
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 1728,
+    "run_id": 3,
+    "seconds": [
+      17.184396817348897,
+      17.182789464946836,
+      17.081908261869103
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 1728,
+    "run_id": 3,
+    "seconds": [
+      0.23621066799387336,
+      0.23477715626358986,
+      0.2352733206935227
+    ],
+    "worker": {
+      "seconds": [
+        0.23621066799387336,
+        0.23477715626358986,
+        0.2352733206935227
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20270.261965222908
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 1728,
+    "run_id": 3,
+    "seconds": [
+      8.324791396036744,
+      8.329465006943792,
+      8.329552800860256
+    ],
+    "worker": {
+      "seconds": [
+        8.324791396036744,
+        8.329465006943792,
+        8.329552800860256
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20270.261965222908
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 1728,
+    "run_id": 3,
+    "seconds": [
+      0.2400950570590794,
+      0.2397676771506667,
+      0.2396045927889645
+    ],
+    "worker": {
+      "seconds": [
+        0.2400950570590794,
+        0.2397676771506667,
+        0.2396045927889645
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 20270.261965222908
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 4096,
+    "run_id": 2,
+    "seconds": [
+      70.6001177332364,
+      70.60316505422816,
+      70.48915619635954
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 4096,
+    "run_id": 2,
+    "seconds": [
+      0.6767715802416205,
+      0.6764094340614974,
+      0.6755904871970415
+    ],
+    "worker": {
+      "seconds": [
+        0.6767715802416205,
+        0.6764094340614974,
+        0.6755904871970415
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48295.466412922964
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 4096,
+    "run_id": 2,
+    "seconds": [
+      46.36886179819703,
+      46.367728451266885,
+      46.37251905910671
+    ],
+    "worker": {
+      "seconds": [
+        46.36886179819703,
+        46.367728451266885,
+        46.37251905910671
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48295.466412922964
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 4096,
+    "run_id": 2,
+    "seconds": [
+      0.6886141053400934,
+      0.6882370421662927,
+      0.6883891746401787
+    ],
+    "worker": {
+      "seconds": [
+        0.6886141053400934,
+        0.6882370421662927,
+        0.6883891746401787
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48295.466412922964
+    }
+  },
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 4096,
+    "run_id": 3,
+    "seconds": [
+      70.39552857773378,
+      70.29179486865178,
+      69.74136970192194
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 4096,
+    "run_id": 3,
+    "seconds": [
+      0.6857025884091854,
+      0.6848220359534025,
+      0.6846847701817751
+    ],
+    "worker": {
+      "seconds": [
+        0.6857025884091854,
+        0.6848220359534025,
+        0.6846847701817751
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48141.205465454186
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 4096,
+    "run_id": 3,
+    "seconds": [
+      40.33134612441063,
+      40.327235081233084,
+      40.32649516686797
+    ],
+    "worker": {
+      "seconds": [
+        40.33134612441063,
+        40.327235081233084,
+        40.32649516686797
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48141.205465454186
+    }
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 4096,
+    "run_id": 3,
+    "seconds": [
+      0.6984553430229425,
+      0.6984594599343836,
+      0.6982247428968549
+    ],
+    "worker": {
+      "seconds": [
+        0.6984553430229425,
+        0.6984594599343836,
+        0.6982247428968549
+      ],
+      "torch": "2.8.0+cu128",
+      "cuda": "12.8",
+      "gpu": "NVIDIA GeForce RTX 5090",
+      "total_void_volume_A3": 48141.205465454186
+    }
+  }
+]

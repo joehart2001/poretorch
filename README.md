@@ -25,6 +25,26 @@ cd poretorch
 python -m pip install -e .
 ```
 
+## Benchmarks
+
+Mean times for three carbon structures per size (runs 1–3), using the median
+of three repeats per structure. PoreTorch uses warm starts. PoreBlazer includes
+its full calculation. Error bars show standard deviation.
+
+![PSD benchmarks](benchmarks/results/carbon_three_runs/scaling.svg)
+
+| Time (s) | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
+|---|---:|---:|---:|---:|
+| PoreBlazer CPU | 0.898 | 3.017 | 16.432 | 70.148 |
+| PoreTorch GPU `all_void` | 0.028 | 0.060 | 0.225 | 0.635 |
+| PoreTorch GPU `covering` | 0.195 | 0.846 | 7.606 | 42.678 |
+| PoreTorch GPU `packed` | 0.028 | 0.062 | 0.229 | 0.648 |
+| `covering` speedup | 4.61× | 3.57× | 2.16× | 1.64× |
+
+Ryzen 9 9950X (one CPU thread) and RTX 5090. `covering` is the closest
+comparison to PoreBlazer. `all_void` and `packed` measure different distributions.
+See the [benchmark guide](benchmarks/README.md) for settings and results.
+
 ## Quick start
 
 ```python
@@ -169,56 +189,6 @@ print(analysis.labels.summary())
 
 Pores are classified as `closed`, `channel`, `planar`, or `network` from their
 periodic percolation dimensionality.
-
-## Benchmarks
-
-Time to save a PSD for amorphous carbon at 1 g/cm³, in seconds (median of
-three runs). **New process** includes startup. **Warm start** measures a
-complete `psd()` call after Python and CUDA initialization. Input reading and
-saving are included. PoreBlazer timings include its full calculation.
-
-![PSD scaling](benchmarks/results/carbon_end_to_end/scaling.svg)
-
-**New process**
-
-| Method | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
-|---|---:|---:|---:|---:|
-| PoreBlazer CPU | 0.915 | 2.767 | 15.881 | 69.553 |
-| PoreTorch GPU · `all_void` | 4.160 | 3.059 | 3.168 | 3.608 |
-| PoreTorch GPU · `covering` | 3.573 | 3.793 | 9.636 | 44.121 |
-| PoreTorch GPU · `packed` | 7.901 | 3.160 | 3.334 | 3.434 |
-
-**Warm start**
-
-| Method | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
-|---|---:|---:|---:|---:|
-| PoreTorch GPU · `all_void` | 0.032 | 0.061 | 0.208 | 0.543 |
-| PoreTorch GPU · `covering` | 0.205 | 0.801 | 6.785 | 41.337 |
-| PoreTorch GPU · `packed` | 0.028 | 0.063 | 0.215 | 0.558 |
-
-**Covering speedup relative to PoreBlazer**
-
-PoreBlazer's full runtime divided by PoreTorch's runtime. Above 1× is faster.
-Warm-start ratios use the same PoreBlazer new-process baseline.
-
-| PoreTorch | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
-|---|---:|---:|---:|---:|
-| GPU, new process | 0.26× | 0.73× | 1.65× | 1.58× |
-| GPU, warm start | 4.47× | 3.45× | 2.34× | 1.68× |
-
-![Covering speedup](benchmarks/results/carbon_end_to_end/covering_speedup.svg)
-
-Hardware: Ryzen 9 9950X (one CPU thread), RTX 5090. Both programs use a
-1.7 Å carbon radius, zero-radius probe, approximately 0.5 Å grids and 0.25 Å
-diameter bins. Installation, input preparation and plotting are excluded.
-Startup times vary between runs.
-
-`covering` is the closest comparison to PoreBlazer: it evaluates every void
-point, while PoreBlazer samples 10,000 points. `all_void` and `packed` measure
-different distributions.
-
-See the [benchmark guide](benchmarks/README.md) for reproduction and
-[raw timings](benchmarks/results/carbon_end_to_end/timings.csv) for the measurements.
 
 ## Numerical controls
 

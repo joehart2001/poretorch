@@ -1,0 +1,510 @@
+{
+  "timestamp_utc": "2026-10-17T19:41:41.327829+00:00",
+  "python": "3.12.3",
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "compiler_flags": "-cpp -O2",
+  "poreblazer_commit": "32e589918c6a6edb51084504af3389455197edbb",
+  "cpu": "AMD Ryzen 9 9950X 16-Core Processor",
+  "cpu_threads": 1,
+  "repeats": 3,
+  "sizes": [
+    216,
+    512,
+    1728,
+    4096
+  ],
+  "runs": [
+    1,
+    2,
+    3
+  ],
+  "devices": [
+    "cuda"
+  ],
+  "cpu_max_atoms": 512,
+  "timing": "mean across structure runs of each structure's 3-repeat median",
+  "variation": "sample standard deviation across per-structure medians",
+  "excluded": "Installation, compilation, common input preparation, loading the output into a plotter, and plotting.",
+  "warm_note": "PoreTorch calls after one warm-up, including input reading, calculation and saving.",
+  "input_dataset": "/home/jh2536/poretorch/benchmarks/inputs/carbon_runs",
+  "parameters": {
+    "sizes": [
+      216,
+      512,
+      1728,
+      4096
+    ],
+    "spacing_A": 0.5,
+    "radius_A": 1.7,
+    "probe_radius_A": 0.0,
+    "bin_width_A": 0.25,
+    "min_radius_A": 0.0,
+    "connected_pore_filter": false,
+    "poreblazer_seed": 21908391,
+    "poreblazer_samples": 10000,
+    "structures": [
+      {
+        "n_atoms": 216,
+        "run_id": 1,
+        "cell_A": [
+          [
+            16.27341908881698,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            16.27341908881698,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            16.27341908881698
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_6x6_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_1/outputs_6x6_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "9a355265f0451dd8e60e61809cd62fb2bbedf05fd3b4cffc01778adc723bef51",
+        "grid": {
+          "shape": [
+            32,
+            32,
+            32
+          ],
+          "n_void": 19494,
+          "requested_spacing_A": 0.5,
+          "actual_spacing_A": 0.5085443465255306,
+          "poretorch_requested_spacing_A": 0.5085443465260392,
+          "poreblazer_requested_spacing_A": 0.5
+        }
+      },
+      {
+        "n_atoms": 216,
+        "run_id": 2,
+        "cell_A": [
+          [
+            16.27341908881698,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            16.27341908881698,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            16.27341908881698
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_6x6_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_2/outputs_6x6_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "a9cd23577d73c1727dcd4b09de4ad175ada23658cad234d59086416d3e208cb6",
+        "grid": {
+          "shape": [
+            32,
+            32,
+            32
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.5,
+          "actual_spacing_A": 0.5085443465255306,
+          "poretorch_requested_spacing_A": 0.5085443465260392
+        }
+      },
+      {
+        "n_atoms": 216,
+        "run_id": 3,
+        "cell_A": [
+          [
+            16.27341908881698,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            16.27341908881698,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            16.27341908881698
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_6x6_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_3/outputs_6x6_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "c663140e2e2e29b61f042aae19b9593eaa8e2e803b74abc4f11bc650ccf52945",
+        "grid": {
+          "shape": [
+            32,
+            32,
+            32
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.5,
+          "actual_spacing_A": 0.5085443465255306,
+          "poretorch_requested_spacing_A": 0.5085443465260392
+        }
+      },
+      {
+        "n_atoms": 512,
+        "run_id": 1,
+        "cell_A": [
+          [
+            21.69789211842264,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            21.69789211842264,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            21.69789211842264
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_8x8_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_1/outputs_8x8_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "310e5df6d187aa01722536867ac2676aebb0d8b19df109a37706e15026794cf5",
+        "grid": {
+          "shape": [
+            44,
+            44,
+            44
+          ],
+          "n_void": 50354,
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.49313391178233273,
+          "actual_spacing_A": 0.49313391178233273,
+          "poretorch_requested_spacing_A": 0.4931339117828259
+        }
+      },
+      {
+        "n_atoms": 512,
+        "run_id": 2,
+        "cell_A": [
+          [
+            21.69789211842264,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            21.69789211842264,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            21.69789211842264
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_8x8_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_2/outputs_8x8_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "61331cd94a0a65fe667d89a1f5d5bb1da86a3e65325ca75b3f5c12d289df7ddf",
+        "grid": {
+          "shape": [
+            44,
+            44,
+            44
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.49313391178233273,
+          "actual_spacing_A": 0.49313391178233273,
+          "poretorch_requested_spacing_A": 0.4931339117828259
+        }
+      },
+      {
+        "n_atoms": 512,
+        "run_id": 3,
+        "cell_A": [
+          [
+            21.69789211842264,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            21.69789211842264,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            21.69789211842264
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_8x8_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_3/outputs_8x8_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "39bab7e0901161a1c599cfe2d76b25af173b54ae96ed27a0887fb9f7c1ddae2b",
+        "grid": {
+          "shape": [
+            44,
+            44,
+            44
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.49313391178233273,
+          "actual_spacing_A": 0.49313391178233273,
+          "poretorch_requested_spacing_A": 0.4931339117828259
+        }
+      },
+      {
+        "n_atoms": 1728,
+        "run_id": 1,
+        "cell_A": [
+          [
+            32.54683817763396,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            32.54683817763396,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            32.54683817763396
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_12x12_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_1/outputs_12x12_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "786dd37fa0e6d8070f5ebb7e1eec5ad73a7cc62225bb1586e0341ba45e29352e",
+        "grid": {
+          "shape": [
+            65,
+            65,
+            65
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.5,
+          "actual_spacing_A": 0.5007205873482148,
+          "poretorch_requested_spacing_A": 0.5007205873487155
+        }
+      },
+      {
+        "n_atoms": 1728,
+        "run_id": 2,
+        "cell_A": [
+          [
+            32.54683817763396,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            32.54683817763396,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            32.54683817763396
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_12x12_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_2/outputs_12x12_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "ffbb1fe2278185a0b276144db01f1fb063c87817fe9ee9cfe35e58fc44adbb6b",
+        "grid": {
+          "shape": [
+            65,
+            65,
+            65
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.5,
+          "actual_spacing_A": 0.5007205873482148,
+          "poretorch_requested_spacing_A": 0.5007205873487155
+        }
+      },
+      {
+        "n_atoms": 1728,
+        "run_id": 3,
+        "cell_A": [
+          [
+            32.54683817763396,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            32.54683817763396,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            32.54683817763396
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_12x12_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_3/outputs_12x12_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "ef7c84bbbcd9bddd804ca3335e3894609079dbeab5caa14ec578adbc5884e417",
+        "grid": {
+          "shape": [
+            65,
+            65,
+            65
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.5,
+          "actual_spacing_A": 0.5007205873482148,
+          "poretorch_requested_spacing_A": 0.5007205873487155
+        }
+      },
+      {
+        "n_atoms": 4096,
+        "run_id": 1,
+        "cell_A": [
+          [
+            43.39578423684528,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            43.39578423684528,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.39578423684528
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_16x16_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_1/outputs_16x16_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "b8487e436c7777027337db884b728f1e60f560b6017774956363dd14c74d885e",
+        "grid": {
+          "shape": [
+            87,
+            87,
+            87
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.4988021176648883,
+          "actual_spacing_A": 0.4988021176648883,
+          "poretorch_requested_spacing_A": 0.4988021176653871
+        }
+      },
+      {
+        "n_atoms": 4096,
+        "run_id": 2,
+        "cell_A": [
+          [
+            43.39578423684528,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            43.39578423684528,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.39578423684528
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_16x16_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_2/outputs_16x16_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "ddf57d86a653e5af7bdc7147f63d79ca2dc9380e4c19c2f49eb0d6cd0c7c6549",
+        "grid": {
+          "shape": [
+            87,
+            87,
+            87
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.4988021176648883,
+          "actual_spacing_A": 0.4988021176648883,
+          "poretorch_requested_spacing_A": 0.4988021176653871
+        }
+      },
+      {
+        "n_atoms": 4096,
+        "run_id": 3,
+        "cell_A": [
+          [
+            43.39578423684528,
+            0.0,
+            0.0
+          ],
+          [
+            0.0,
+            43.39578423684528,
+            0.0
+          ],
+          [
+            0.0,
+            0.0,
+            43.39578423684528
+          ]
+        ],
+        "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3/sim_multi_16x16_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta1fs/run_3/outputs_16x16_melt_8000K_quench_rho_1_dtq_0.5fs_dta_1fs/anneal_3000/data_cooled_rho1.data",
+        "source_sha256": "8bcfe563e4475be464dc4b5c007c59c2412ec44976be3afd48969dc37a9c1591",
+        "grid": {
+          "shape": [
+            87,
+            87,
+            87
+          ],
+          "requested_spacing_A": 0.5,
+          "poreblazer_requested_spacing_A": 0.4988021176648883,
+          "actual_spacing_A": 0.4988021176648883,
+          "poretorch_requested_spacing_A": 0.4988021176653871
+        }
+      }
+    ],
+    "runs": [
+      1,
+      2,
+      3
+    ]
+  },
+  "previous_batches": [
+    {
+      "source": "benchmarks/results/carbon_end_to_end",
+      "run_id": 1,
+      "sizes": [
+        216,
+        512
+      ],
+      "timestamp_utc": "2026-10-17T19:03:38.182822+00:00"
+    },
+    {
+      "source": "benchmarks/results/carbon_end_to_end",
+      "run_id": 1,
+      "sizes": [
+        1728,
+        4096
+      ],
+      "devices": [
+        "cuda"
+      ],
+      "timestamp_utc": "2026-10-17T19:21:58.784753+00:00"
+    },
+    {
+      "timestamp_utc": "2026-10-17T19:21:58.784753+00:00",
+      "reused_records": 16
+    },
+    {
+      "timestamp_utc": "2026-10-17T19:40:21.497795+00:00",
+      "reused_records": 23
+    }
+  ],
+  "source_sha256": {
+    "defaults.f90": "6ca694e0d9db241d6152b6e5f286c28ca237fcb0996d2aecc12aca436515e83f",
+    "utils.f90": "06e3a74ad4858e1c5f4b4335c10ddb0669fd9bc2db90adc8dece74bf87f71b16",
+    "percolation.f90": "8a5e2c54f2ab4821fcb4b712362fa69c7d9171f771db7713970d3c8bdf361816",
+    "random.f90": "2dfdc73e7f0c71cb258996b5ac53e78efd0639173ed87aced3666ae2fc4577ea",
+    "fundcell.f90": "aea911de74e33c3b0c5d4f474bee8f8351859809ab2500aea2a9ad9074c74744",
+    "matrixops.f90": "2a7238e8cac459f27f560d623bdc1f92873a2e1b67c61756eca649886e858563",
+    "matrix.f90": "51bc0f83d7d5c79e749c7a1aeccf15c22b625a11633f9b5b9854d07ffe6241e8",
+    "molecule.f90": "ad669fe5177f2ca5c57908b584b9b1da6179acad9888cc2eec1d1a0db6828149",
+    "poreblazer.f90": "26dec1eca8bc04aef4fc193d34795063f5e4e6c5d5faafec23b1067656039b79",
+    "vector.f90": "dbc7595ba330a0e5c42e931fb6945b734cd80577facd32cf0d8c3a70837e9746",
+    "Makefile_gfort": "df7e57d536cc0bfea0e88c9a8ad0464083abecc3ad8ae7e6697076881fc1ad95"
+  },
+  "torch": "2.8.0+cu128",
+  "cuda": "12.8",
+  "gpu": "NVIDIA GeForce RTX 5090"
+}
