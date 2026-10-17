@@ -1,4 +1,4 @@
-"""Plot mean carbon benchmark times."""
+"""Plot carbon benchmark times, omitting pending measurements."""
 from __future__ import annotations
 
 import argparse
@@ -19,8 +19,8 @@ METHODS = [
 def plot(directory):
     with (directory/'timings.csv').open() as f:
         rows = list(csv.DictReader(f))
-    if not rows or any(int(r['n_structures']) != 3 for r in rows):
-        raise ValueError('plots require three structures per result')
+    if not rows or any(int(r['n_structures']) not in (1, 3) for r in rows):
+        raise ValueError('expected one or three structures per result')
     sizes = sorted({int(r['n_atoms']) for r in rows})
 
     def series(code, method, weighting):
@@ -28,8 +28,10 @@ def plot(directory):
                     if r['code'] == code and r['method'] == method
                     and r['weighting'] == weighting
                     and (code == 'PoreBlazer' or r['device'] == 'cuda')}
-        return ([float(selected[n]['seconds']) for n in sizes],
-                [float(selected[n]['seconds_std']) for n in sizes])
+        return ([float(selected[n]['seconds']) if n in selected and selected[n]['seconds'] != ''
+                 else float('nan') for n in sizes],
+                [float(selected[n]['seconds_std']) if n in selected and selected[n]['seconds_std'] != ''
+                 else float('nan') for n in sizes])
 
     fig, ax = plt.subplots(figsize=(7, 4.5))
     for method, weighting, color, marker in METHODS:
@@ -40,7 +42,7 @@ def plot(directory):
     ax.errorbar(sizes, pb, yerr=pb_std, color='#222222', marker='X', capsize=3,
                 linewidth=1.7, label='PoreBlazer CPU')
     ax.set_ylabel('Time (s)')
-    ax.set_title('Mean time across three structures')
+    ax.set_title('PSD timings')
     ax.legend(frameon=False, fontsize=8)
 
     ax.set_xscale('log')
@@ -53,9 +55,11 @@ def plot(directory):
     fig.tight_layout()
     for extension in ('svg', 'png'):
         path = directory/f'scaling.{extension}'
-        fig.savefig(path, dpi=180, bbox_inches='tight')
+        temporary = directory/f'.scaling.tmp.{extension}'
+        fig.savefig(temporary, dpi=180, bbox_inches='tight')
         if extension == 'svg':
-            path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
+            temporary.write_text('\n'.join(line.rstrip() for line in temporary.read_text().splitlines())+'\n')
+        temporary.replace(path)
     plt.close(fig)
 
 

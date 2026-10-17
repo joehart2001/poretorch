@@ -27,18 +27,19 @@ python -m pip install -e .
 
 ## Benchmarks
 
-Mean times for three carbon structures per size (runs 1–3), using the median
-of three repeats per structure. PoreTorch uses warm starts. PoreBlazer includes
-its full calculation. Error bars show standard deviation.
+For 216–4,096 atoms, times are averaged across three structures (runs 1–3).
+The 32,768-atom case uses one uncooled structure. Each timing is the median of
+three repeats. PoreTorch uses warm starts. PoreBlazer includes its full
+calculation. Error bars show standard deviation across structures. `-` means pending.
 
-![PSD benchmarks](benchmarks/results/carbon_three_runs/scaling.svg)
+![PSD benchmarks](benchmarks/results/carbon_report/scaling.svg)
 
-| Time (s) | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
-|---|---:|---:|---:|---:|
-| PoreBlazer CPU | 0.898 | 3.017 | 16.432 | 70.148 |
-| PoreTorch GPU `all_void` | 0.028 | 0.060 | 0.225 | 0.635 |
-| PoreTorch GPU `covering` | 0.195 | 0.846 | 7.606 | 42.678 |
-| PoreTorch GPU `packed` | 0.028 | 0.062 | 0.229 | 0.648 |
+| Time (s) | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms | 32,768 atoms |
+|---|---:|---:|---:|---:|---:|
+| PoreBlazer CPU | 0.898 | 3.017 | 16.432 | 70.148 | - |
+| PoreTorch GPU `all_void` | 0.028 | 0.060 | 0.225 | 0.635 | 4.202 |
+| PoreTorch GPU `covering` | 0.195 | 0.846 | 7.606 | 42.678 | - |
+| PoreTorch GPU `packed` | 0.028 | 0.062 | 0.229 | 0.648 | 4.346 |
 
 Ryzen 9 9950X (one CPU thread) and RTX 5090. The methods use different
 pore-size definitions.
