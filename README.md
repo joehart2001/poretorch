@@ -183,29 +183,4 @@ periodic percolation dimensionality.
 The grid uses voxel centres and tiles the cell exactly. Minimum-image distances
 use a Minkowski-reduced basis, including for skewed triclinic cells.
 
-## Development
-
-```bash
-python -m pip install -e ".[dev]"
-pytest -q
-```
-
-### Documentation
-
-Build the documentation locally with:
-
-```bash
-python -m pip install -e ".[docs]"
-sphinx-build -W --keep-going -b html docs/source docs/build/html
-```
-
-Documentation is published at <https://joehart2001.github.io/poretorch/>.
-The `.github/workflows/docs.yml` workflow checks documentation builds on pull
-requests and deploys after each push to `main`. It can also be run manually
-from the Actions tab. GitHub Pages uses **Settings → Pages → Source: GitHub
-Actions**.
-
-See [`docs/source/methods.md`](docs/source/methods.md) for the detailed method
-definitions and [`docs/source/api.md`](docs/source/api.md) for the API.
-
 PoreTorch is released under the MIT license.
