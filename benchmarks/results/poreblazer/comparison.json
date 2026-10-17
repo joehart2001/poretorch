@@ -1,0 +1,32 @@
+[
+  {
+    "n_atoms": 64,
+    "device": "cpu",
+    "max_survival_difference": 0.007325294828793738
+  },
+  {
+    "n_atoms": 64,
+    "device": "cuda",
+    "max_survival_difference": 0.007325294828793738
+  },
+  {
+    "n_atoms": 128,
+    "device": "cpu",
+    "max_survival_difference": 0.006101100670914017
+  },
+  {
+    "n_atoms": 128,
+    "device": "cuda",
+    "max_survival_difference": 0.006101100670914017
+  },
+  {
+    "n_atoms": 256,
+    "device": "cpu",
+    "max_survival_difference": 0.006256214381763436
+  },
+  {
+    "n_atoms": 256,
+    "device": "cuda",
+    "max_survival_difference": 0.006256214381763436
+  }
+]
