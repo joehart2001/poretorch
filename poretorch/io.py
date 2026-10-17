@@ -120,6 +120,14 @@ def _save_table(target: Path, distribution, delimiter: str) -> None:
         delimiter=delimiter,
         header=delimiter.join(names),
         comments="",
+        footer="\n".join(
+            f"# {key}: {value}" for key, value in {
+                "method": distribution.method,
+                "weighting": distribution.weighting,
+                "volume_kind": distribution.volume_kind,
+                "total_void_volume_A3": distribution.total_void_volume_A3,
+            }.items()
+        ),
     )
 
 

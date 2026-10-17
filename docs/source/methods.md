@@ -47,7 +47,7 @@ therefore **disjoint**. Candidate radii are capped to avoid overlap with their
 own periodic replicas or with open cell boundaries. The result is a discrete
 sphere-packing spectrum, not a partition of the void.
 
-For `all_void` and `covering`, overlap decides which *size* a point receives,
+With default voxel weighting for `all_void` and `covering`, overlap decides which *size* a point receives,
 not how much volume it contributes. Each included voxel carries its own voxel
 volume exactly once. `packed` instead weights each accepted sphere by its
 analytic volume, so its absolute scale is not directly comparable with the two
@@ -61,6 +61,39 @@ point. One sphere per void point, all of them free to overlap. This is the
 local-pore-radius distribution of the void, in the spirit of the Gelb-Gubbins
 geometric PSD. It answers: at a randomly chosen point in the void, how big is the
 largest sphere centred there?
+
+
+### Optional sphere weighting
+
+```python
+voxel = psd(atoms, method="all_void", weighting="voxel")  # default
+sphere = psd(atoms, method="all_void", weighting="sphere")
+```
+
+Both use identical grid points, local clearance radii and filters. Voxel
+weighting contributes one voxel volume per sample; sphere weighting contributes
+`4πr³/3`. At equal occurrence counts, clearances `r` and `2r` therefore contribute
+in ratios 1:1 and 1:8, respectively. Sphere weighting favours larger local
+clearances and counts overlapping space repeatedly. Its integral is **not
+physical pore volume or porosity**, and its absolute scale depends on grid density.
+
+Supported combinations are `all_void` with `voxel` or `sphere`, `covering` with
+`voxel`, and `packed` with `sphere`. Omitting `weighting` preserves these methods'
+existing defaults. Unsupported combinations raise `ValueError`. The option is
+also available through `analyse` and `pore_size_distribution`.
+
+`volume_A3` stores the per-bin sum of the chosen weights. `weighting` and
+`volume_kind` identify its meaning in results, summaries and saved outputs;
+CSV/TSV files retain numeric columns and append metadata as `#` comment lines
+(use `comment="#"` when loading with pandas).
+`total_void_volume_A3` and `stats["porosity"]` always describe the actual
+voxel-based accessible void **before** connected-pore and minimum-radius
+filtering, regardless of weighting. Neither is derived from a sphere-weighted
+integral. Ensemble averaging rejects different weightings.
+
+For either weighting, a nonempty normalised histogram obeys
+`normalised.sum() * bin_width_A == 1` (full-width rectangular bins).
+Per-bin fractions are `normalised * bin_width_A`; an empty histogram stays zero.
 
 ### covering (overlapping spheres)
 

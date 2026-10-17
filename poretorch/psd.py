@@ -26,12 +26,10 @@ with **non-overlapping** ones, and that is the sharpest division between them:
     to avoid overlap with periodic replicas or open cell boundaries. This is a
     spectrum of discrete inscribed spheres, not a partition of the void.
 
-Overlap decides which size a point is labelled with, not how much volume it
-contributes, so no method double-counts void volume. The two overlapping methods
-weight each void *voxel* by its own voxel volume, counted exactly once, so they
-integrate to the accessible void volume however much their spheres overlap.
-``"packed"`` weights each accepted sphere by its sphere volume. Its absolute
-scale is therefore different from the voxel-weighted methods.
+By default, all_void and covering count each included voxel once; packed uses
+sphere volumes. Optional all_void sphere weighting instead sums 4πr³/3 for
+each local clearance. It favours larger clearances and counts overlapping
+space repeatedly: its integral is neither physical pore volume nor porosity.
 """
 
 from __future__ import annotations
@@ -61,6 +59,28 @@ METHOD_ALIASES = {
     "sphere_packing": "packed",
 }
 
+SUPPORTED_WEIGHTINGS = {
+    "all_void": ("voxel", "sphere"),
+    "covering": ("voxel",),
+    "packed": ("sphere",),
+}
+
+
+def _resolve_weighting(method: str, weighting: str | None) -> str:
+    """Resolve the method default and reject unsupported combinations."""
+    method = METHOD_ALIASES.get(method, method)
+    if method not in METHODS:
+        raise ValueError(f"method must be one of {METHODS}, got {method!r}")
+    supported = SUPPORTED_WEIGHTINGS[method]
+    if weighting is None:
+        return supported[0]
+    if weighting not in supported:
+        raise ValueError(
+            f"weighting for {method!r} must be one of {supported}, got {weighting!r}"
+        )
+    return weighting
+
+
 DEFAULT_BIN_WIDTH = 0.25
 MAX_INTERMEDIATE = 32_000_000
 
@@ -73,23 +93,23 @@ class PSD:
     """
     A pore-size distribution over diameter bins.
 
-    The stored quantity is the void volume in each bin, in cubic Angstrom, which
-    is convention-free. The properties convert that to the usual reporting
-    forms.
+    The stored quantity is the sum of weights in each bin, in cubic Angstrom.
+    For all_void sphere weighting this is summed overlapping-sphere volume,
+    not physical pore volume. The properties preserve that interpretation.
 
     Attributes
     ----------
     diameters_A
         Bin centres in Angstrom, shaped ``(n_bins,)``.
     volume_A3
-        Void volume falling in each bin, in cubic Angstrom.
+        Sum of volume weights falling in each bin, in cubic Angstrom.
     bin_width_A
         Bin width in Angstrom.
     method
         Which pore-size definition produced this distribution.
     total_void_volume_A3
-        Accessible void volume of the cell, for reference against
-        ``volume_A3.sum()``.
+        Actual voxel-based accessible void volume before connected-pore and
+        minimum-radius filtering, independent of weighting.
     mass_g
         Mass of the cell contents in grams, or ``None`` if unknown.
     stats
@@ -99,6 +119,8 @@ class PSD:
         structure.
     n_frames
         Number of frames averaged into this distribution.
+    weighting
+        Resolved volume weights: "voxel" or "sphere".
     """
 
     diameters_A: np.ndarray
@@ -110,6 +132,19 @@ class PSD:
     stats: dict = dataclass_field(default_factory=dict)
     se_volume_A3: np.ndarray | None = None
     n_frames: int = 1
+    weighting: str | None = None
+
+    def __post_init__(self) -> None:
+        self.weighting = _resolve_weighting(self.method, self.weighting)
+
+    @property
+    def volume_kind(self) -> str:
+        """Interpretation of bin sums, distinct from total_void_volume_A3."""
+        if self.weighting == "voxel":
+            return "voxel_void_volume"
+        if METHOD_ALIASES.get(self.method, self.method) == "all_void":
+            return "overlapping_sphere_volume"
+        return "packed_sphere_volume"
 
     @property
     def diameters_nm(self) -> np.ndarray:
@@ -119,7 +154,7 @@ class PSD:
     @property
     def dV_dd_cc_per_nm_per_g(self) -> np.ndarray:
         """
-        Differential pore volume in cc/nm/g, the form adsorption data uses.
+        Differential weighted volume in cc/nm/g, the form adsorption data uses.
 
         Raises
         ------
@@ -135,7 +170,7 @@ class PSD:
 
     @property
     def dV_dd_A2(self) -> np.ndarray:
-        """Differential pore volume per cell in Angstrom squared, mass-free."""
+        """Differential weighted volume per cell in Angstrom squared, mass-free."""
         return self.volume_A3 / self.bin_width_A
 
     @property
@@ -183,7 +218,7 @@ class PSD:
 
     @property
     def cumulative_volume_A3(self) -> np.ndarray:
-        """Cumulative void volume up to each bin, in cubic Angstrom."""
+        """Cumulative sum of volume weights up to each bin, in cubic Angstrom."""
         return np.cumsum(self.volume_A3)
 
     @property
@@ -206,6 +241,8 @@ class PSD:
         """
         out = {
             "method": self.method,
+            "weighting": self.weighting,
+            "volume_kind": self.volume_kind,
             "diameter_A": self.diameters_A,
             "diameter_nm": self.diameters_nm,
             "volume_A3": self.volume_A3,
@@ -516,6 +553,7 @@ def pore_size_distribution(
     filter_size: int = 3,
     center_batch_size: int = 4096,
     progress: bool = False,
+    weighting: str | None = None,
 ) -> PSD:
     """
     Build a pore-size distribution from a precomputed distance field.
@@ -526,11 +564,16 @@ def pore_size_distribution(
         Distance field from :func:`poretorch.field.distance_field`.
     method
         Which pore-size definition to use. ``"all_void"`` and ``"covering"``
-        both work with overlapping spheres, one per void point, and weight each
-        voxel by its own volume. ``"packed"`` uses non-overlapping spheres and
-        weights each by its sphere volume. See the module docstring for the
+        both work with overlapping spheres, one per void point, and by default
+        weight each voxel by its own volume. ``"packed"`` uses non-overlapping
+        spheres and weights each by its sphere volume. See the module docstring for the
         definitions. ``"poreblazer"`` and ``"sphere_packing"`` are accepted as
         aliases for ``"covering"`` and ``"packed"``.
+    weighting
+        None preserves defaults: voxel for all_void/covering, sphere for packed.
+        all_void also supports sphere: weight each included local clearance by
+        4πr³/3, counting overlaps repeatedly. Other combinations raise ValueError.
+        Radii and filters are unchanged. Sphere sums are not physical pore volume.
     labels
         Optional :class:`poretorch.labels.PoreLabels`. Used by ``"packed"`` to
         record which pore each sphere came from, and to exclude points that
@@ -569,8 +612,7 @@ def pore_size_distribution(
         ``"packed"`` the sphere count and packed cell fraction.
     """
     method = METHOD_ALIASES.get(method, method)
-    if method not in METHODS:
-        raise ValueError(f"method must be one of {METHODS}, got {method!r}")
+    weighting = _resolve_weighting(method, weighting)
 
     voxel_volume = field.grid.voxel_volume
     extra_stats: dict = {}
@@ -613,7 +655,10 @@ def pore_size_distribution(
             ]
             sizes = sizes[kept > 0]
         sizes = sizes[sizes >= min_radius]
-        weights = np.full(sizes.shape, voxel_volume, dtype=np.float64)
+        if weighting == "sphere":
+            weights = (4.0 / 3.0) * np.pi * sizes.astype(np.float64)**3
+        else:
+            weights = np.full(sizes.shape, voxel_volume, dtype=np.float64)
 
     centers, volume = bin_distribution(
         sizes,
@@ -632,6 +677,7 @@ def pore_size_distribution(
         volume_A3=volume,
         bin_width_A=float(bin_width),
         method=method,
+        weighting=weighting,
         total_void_volume_A3=field.void_volume,
         mass_g=field.mass_g,
         stats=stats,

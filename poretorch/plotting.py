@@ -64,7 +64,11 @@ def plot_psd(
         raise ValueError("nothing to plot")
 
     if labels is None:
-        labels = [dist.method for dist in distributions]
+        labels = [
+            f"{dist.method} (sphere-weighted)"
+            if dist.volume_kind == "overlapping_sphere_volume" else dist.method
+            for dist in distributions
+        ]
     if len(labels) != len(distributions):
         raise ValueError(
             f"got {len(labels)} labels for {len(distributions)} distributions"
@@ -98,6 +102,11 @@ def plot_psd(
         ax.set_xlim(*xlim)
     ax.set_ylim(bottom=0.0)
     ax.set_xlabel("Pore diameter (Å)")
+    if any(d.volume_kind == "overlapping_sphere_volume" for d in distributions):
+        if mode == "volume":
+            ylabel = "Weighted volume, including overlapping spheres (Å$^3$)"
+        elif mode == "dV_dd":
+            ylabel = "Weighted dV/dd, including overlapping spheres (cc nm$^{-1}$ g$^{-1}$)"
     ax.set_ylabel(ylabel)
     if title:
         ax.set_title(title)

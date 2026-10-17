@@ -66,6 +66,8 @@ class PoreAnalysis:
             "cell_volume_A3": self.field.cell_volume,
             "specific_void_volume_cc_per_g": self.field.specific_void_volume,
             "method": self.psd.method,
+            "weighting": self.psd.weighting,
+            "volume_kind": self.psd.volume_kind,
         }
         out.update(self.labels.summary())
         out.update({f"psd_{k}": v for k, v in self.psd.stats.items()})
@@ -219,6 +221,7 @@ def analyse(
     index=None,
     read_kwargs=None,
     progress: bool = False,
+    weighting: str | None = None,
     **kwargs,
 ) -> PoreAnalysis:
     """
@@ -230,6 +233,11 @@ def analyse(
         An ASE ``Atoms``, or a path to a structure file. An iterable of frames
         is accepted but only its first frame is analysed. Use :func:`psd` to
         average a distribution over frames.
+    weighting
+        None preserves method defaults (voxel for all_void/covering, sphere for
+        packed). all_void additionally accepts "sphere", summing overlapping
+        sphere volumes rather than physical void volume. See
+        :func:`poretorch.psd.pore_size_distribution` for supported combinations.
     method
         Pore-size definition: ``"all_void"`` or ``"covering"`` for overlapping
         spheres, one per void point, or ``"packed"`` for non-overlapping ones.
@@ -296,6 +304,7 @@ def analyse(
     distribution = pore_size_distribution(
         field,
         method=method,
+        weighting=weighting,
         labels=labels,
         bin_width=bin_width,
         max_diameter=max_diameter,
@@ -325,6 +334,7 @@ def psd(
     outdir=None,
     output: str | None = None,
     progress: bool = False,
+    weighting: str | None = None,
     **kwargs,
 ) -> PSD:
     """
@@ -337,6 +347,11 @@ def psd(
     obj
         An ASE ``Atoms``, an iterable of ``Atoms``, or a path to a structure or
         trajectory file.
+    weighting
+        None preserves method defaults (voxel for all_void/covering, sphere for
+        packed). all_void additionally accepts "sphere", summing overlapping
+        sphere volumes rather than physical void volume. See
+        :func:`poretorch.psd.pore_size_distribution` for supported combinations.
     method
         Pore-size definition. ``"all_void"`` sizes each void point by the
         largest empty sphere centred on it, and ``"covering"`` by the largest
@@ -397,6 +412,7 @@ def psd(
         analysis = analyse(
             frame,
             method=method,
+            weighting=weighting,
             radii=radii,
             grid_spacing=grid_spacing,
             probe_radius=probe_radius,
@@ -429,7 +445,8 @@ def average_psds(distributions) -> PSD:
     Parameters
     ----------
     distributions
-        Iterable of :class:`poretorch.psd.PSD` sharing a bin width and method.
+        Iterable of :class:`poretorch.psd.PSD` sharing a bin width, method
+        and weighting.
 
     Returns
     -------
@@ -450,6 +467,12 @@ def average_psds(distributions) -> PSD:
     if len(methods) != 1:
         raise ValueError(f"cannot average distributions from methods {methods}")
 
+    weightings = {d.weighting for d in distributions}
+    if len(weightings) != 1:
+        raise ValueError(
+            f"cannot average distributions with different weightings {weightings}"
+        )
+
     bin_width = distributions[0].bin_width_A
     n_bins = max(d.volume_A3.size for d in distributions)
     stack = np.zeros((len(distributions), n_bins), dtype=np.float64)
@@ -469,6 +492,7 @@ def average_psds(distributions) -> PSD:
         volume_A3=mean,
         bin_width_A=bin_width,
         method=distributions[0].method,
+        weighting=distributions[0].weighting,
         total_void_volume_A3=float(
             np.mean([d.total_void_volume_A3 for d in distributions])
         ),

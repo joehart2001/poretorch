@@ -80,10 +80,19 @@ reservoir.
 | `covering` | Largest empty sphere that contains the voxel | Voxel volume | PoreBlazer-style geometric PSD |
 | `packed` | Radius of an accepted non-overlapping sphere | Sphere volume | Discrete sphere-packing spectrum |
 
+`psd(atoms, method="all_void", weighting="sphere")` optionally weights each
+local clearance by `4πr³/3`, using the same points and filters. This favours
+larger clearances and counts overlapping space repeatedly: the integral is not
+physical pore volume or porosity. Defaults remain unchanged (`voxel` for
+`all_void`/`covering`, `sphere` for `packed`); other combinations are rejected.
+Results and exports record `weighting` and `volume_kind`, and ensembles require
+matching weightings. See [Methods](docs/source/methods.md#optional-sphere-weighting).
+
+
 ### `all_void`
 
 Each included voxel is sized by the largest empty sphere centred exactly there.
-Every voxel contributes once, so the distribution integrates to the included
+By default every voxel contributes once, so the distribution integrates to the included
 void volume unless an explicit filter is applied.
 
 ### `covering`
