@@ -1,0 +1,22 @@
+[
+  {
+    "n_atoms": 216,
+    "device": "cpu",
+    "max_survival_difference": 0.006740079609298122
+  },
+  {
+    "n_atoms": 216,
+    "device": "cuda",
+    "max_survival_difference": 0.006740079609298122
+  },
+  {
+    "n_atoms": 512,
+    "device": "cpu",
+    "max_survival_difference": 0.005174117095151809
+  },
+  {
+    "n_atoms": 512,
+    "device": "cuda",
+    "max_survival_difference": 0.005174117095151809
+  }
+]

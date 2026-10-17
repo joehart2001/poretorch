@@ -34,7 +34,7 @@ SEED = 21908391
 
 DRIVER = '''program poreblazer
 use parameters
-use lattice, only: ncubesx, ncubesy, ncubesz, ng_cubes
+use lattice, only: ncubesx, ncubesy, ncubesz, ng_cubes, cube_size
 use adsorbent, only: natoms
 use random, only: rranf
 implicit none
@@ -52,6 +52,7 @@ call lattice_calculations
 call system_clock(finish)
 write(*,*) 'BENCH_LATTICE', real(finish-start,8)/real(rate,8)
 write(*,*) 'BENCH_GRID', ncubesx, ncubesy, ncubesz, ng_cubes
+write(*,*) 'BENCH_SPACING', cube_size
 property = 'Total'
 ! Validation only: consume the draws used by the full surface-area routine.
 if (command_argument_count() > 1) then
@@ -118,17 +119,58 @@ def structure(n_atoms):
     return positions, np.diag([side] * 3)
 
 
+def carbon_structure(path):
+    """Load a cubic carbon cell without applying LAMMPS image flags or scaling."""
+    from ase.io import read
+
+    atoms = read(path, format='lammps-data', atom_style='atomic', read_image_flags=False)
+    cell = np.asarray(atoms.cell)
+    if not np.all(atoms.numbers == 6):
+        raise ValueError(f'{path}: only carbon structures are supported')
+    if not np.all(atoms.pbc) or not np.allclose(cell, np.eye(3)*cell[0, 0], rtol=0, atol=1e-12):
+        raise ValueError(f'{path}: a fully periodic cubic cell is required')
+    positions = atoms.positions.copy()
+    positions -= positions.min(axis=0)
+    return positions, cell
+
+
+def matched_spacing(cell, grid, pb_spacing):
+    """Match PoreBlazer's actual grid without changing the structure or cell."""
+    actual = cell[0, 0] / grid[0]
+    if grid[:3] != [grid[0]] * 3 or not np.isclose(actual, pb_spacing, rtol=1e-12, atol=0):
+        raise ValueError('PoreBlazer grid does not tile the cubic cell; cannot compare identical grids')
+    # Grid.from_cell uses ceil; guard against roundoff in perpendicular widths.
+    return actual * (1 + 1e-12)
+
+
+def poreblazer_spacing(cell, target=SPACING):
+    """Avoid PB's second integer truncation dropping a grid plane by roundoff."""
+    side = float(cell[0, 0])
+    count = int(side / target)
+    if count < 1:
+        raise ValueError('Grid spacing exceeds the cell length')
+    if int(side / (side / count)) == count:
+        return target
+    # Prefer a finer grid over losing a cell plane; never rescale the cell.
+    while int(side / (side / count)) != count:
+        count += 1
+    return side / count
+
+
 def inputs(directory, positions, cell):
     directory.mkdir()
     side = cell[0, 0]
+    spacing = poreblazer_spacing(cell)
+    if int(side / spacing)**3 < 10000:
+        raise ValueError('PoreBlazer needs at least 10,000 grid points for its sample buffer')
     with (directory / 'atoms.xyz').open('w') as handle:
-        handle.write(f'{len(positions)}\nsynthetic periodic carbon; seed 42\n')
+        handle.write(f'{len(positions)}\nperiodic carbon benchmark\n')
         for xyz in positions:
             handle.write('C ' + ' '.join(f'{x:.17g}' for x in xyz) + '\n')
     (directory / 'input.dat').write_text(f'atoms.xyz\n{side} {side} {side}\n90 90 90\n')
     (directory / 'atoms.dat').write_text('1\nC 3.4 52.84 12.011\n')
     (directory / 'defaults.dat').write_text(
-        f'atoms.dat\n2.58 10.22 298 12.8\n0.0\n500\n{SPACING}\n'
+        f'atoms.dat\n2.58 10.22 298 12.8\n0.0\n500\n{spacing}\n'
         f'{MAX_DIAMETER} {BIN_WIDTH}\n{SEED}\n0\n')
 
 
@@ -146,6 +188,9 @@ def pb_run(exe, directory, timeout, match_full_rng=False):
     match = re.search(r'BENCH_GRID\s+(\d+)\s+(\d+)\s+(\d+)\s+(\d+)', completed.stdout)
     if match:
         times['grid'] = [int(x) for x in match.groups()]
+    match = re.search(r'BENCH_SPACING\s+(\S+)', completed.stdout)
+    if match:
+        times['spacing_A'] = float(match[1])
     times['wall'] = wall
     return times
 
@@ -163,19 +208,33 @@ def timed(call, device):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--poreblazer-src', type=Path, required=True)
-    parser.add_argument('--sizes', nargs='+', type=int, default=[64, 128, 256])
+    selection = parser.add_mutually_exclusive_group()
+    selection.add_argument('--sizes', nargs='+', type=int, default=[64, 128, 256])
+    selection.add_argument('--structures', nargs='+', type=Path, help='Cubic carbon LAMMPS data files, run in the supplied order')
     parser.add_argument('--repeats', type=int, default=3)
     parser.add_argument('--timeout', type=float, default=60)
     parser.add_argument('--devices', nargs='+', choices=['cpu', 'cuda'], default=['cpu', 'cuda'])
-    parser.add_argument('--output', type=Path, default=Path('benchmarks/results/poreblazer'))
+    parser.add_argument('--output', type=Path)
     args = parser.parse_args()
-    if args.repeats < 1 or min(args.sizes) < 64:
+    if args.repeats < 1 or (not args.structures and min(args.sizes) < 64):
         parser.error('Use repeats >= 1 and sizes >= 64 (PoreBlazer needs room for 10,000 samples)')
     if 'cuda' in args.devices and not torch.cuda.is_available():
         parser.error('CUDA is unavailable; use --devices cpu')
     torch.set_num_threads(1)
     torch.set_num_interop_threads(1)
-    out = args.output.resolve()
+    cases = []
+    if args.structures:
+        for path in args.structures:
+            path = path.resolve()
+            positions, cell = carbon_structure(path)
+            cases.append((len(positions), positions, cell, path))
+    else:
+        for n in args.sizes:
+            positions, cell = structure(n)
+            cases.append((n, positions, cell, None))
+    if len({case[0] for case in cases}) != len(cases):
+        parser.error('Each input must have a distinct atom count for output directories')
+    out = (args.output or Path('benchmarks/results/carbon' if args.structures else 'benchmarks/results/poreblazer')).resolve()
     out.mkdir(parents=True, exist_ok=True)
     source = args.poreblazer_src.resolve()
     metadata = dict(poreblazer_commit=subprocess.check_output(
@@ -186,30 +245,40 @@ def main():
         numpy=np.__version__, cuda=torch.version.cuda,
         gpu=torch.cuda.get_device_name(0) if torch.cuda.is_available() else None,
         cpu=next(line.split(':', 1)[1].strip() for line in Path('/proc/cpuinfo').read_text().splitlines() if line.startswith('model name')),
-        cpu_threads=1, sizes=args.sizes, repeats=args.repeats, summary='median after one warm-up',
+        cpu_threads=1, sizes=[case[0] for case in cases], repeats=args.repeats, summary='median after one warm-up',
         spacing_A=SPACING, radius_A=RADIUS, probe_radius_A=0., bin_width_A=BIN_WIDTH,
-        min_radius_A=0., connected_pore_filter=False, structure_seed=42, poreblazer_seed=SEED,
+        min_radius_A=0., connected_pore_filter=False, structure_seed=None if args.structures else 42, poreblazer_seed=SEED,
         poreblazer_samples=10000, timeout_seconds=args.timeout)
+    metadata['structures'] = [dict(n_atoms=n, cell_A=cell.tolist(),
+        source=str(path) if path else 'synthetic',
+        source_sha256=hashlib.sha256(path.read_bytes()).hexdigest() if path else None)
+        for n, _, cell, path in cases]
     (out / 'metadata.json').write_text(json.dumps(metadata, indent=2) + '\n')
     rows, comparisons, raw = [], [], []
     with tempfile.TemporaryDirectory(prefix='poretorch-pb-') as temp:
         temp = Path(temp)
         isolated = build(source, temp / 'isolated', out, True)
         full = build(source, temp / 'full', out, False)
-        for n in args.sizes:
-            positions, cell = structure(n)
+        for n, positions, cell, source_path in cases:
             directory = temp / f'run-{n}'
             inputs(directory, positions, cell)
             print(f'{n} atoms: PoreBlazer isolated', flush=True)
             # Persist inputs, curves and the final run log, but no build files.
             saved = out / str(n)
             saved.mkdir(exist_ok=True)
+            if source_path and source_path != saved / 'source.data':
+                shutil.copy2(source_path, saved / 'source.data')
             for path in directory.iterdir():
                 shutil.copy2(path, saved / path.name)
             measurements = [pb_run(isolated, directory, args.timeout) for _ in range(args.repeats + 1)][1:]
             raw.append(dict(code='PoreBlazer', n_atoms=n, runs=measurements))
             grid = measurements[0]['grid']
             assert np.prod(grid[:3]) >= 10000
+            spacing = matched_spacing(cell, grid, measurements[0]['spacing_A'])
+            (saved / 'grid.json').write_text(json.dumps(dict(shape=grid[:3], n_void=grid[3],
+                requested_spacing_A=SPACING, poreblazer_requested_spacing_A=poreblazer_spacing(cell),
+                actual_spacing_A=measurements[0]['spacing_A'],
+                poretorch_requested_spacing_A=spacing), indent=2)+'\n')
             pb_curve = np.loadtxt(directory / 'Total_psd_cumulative.txt')
             for filename in ('Total_psd.txt', 'Total_psd_cumulative.txt', 'run.log'):
                 shutil.copy2(directory / filename, saved / filename)
@@ -221,7 +290,7 @@ def main():
                 pipeline_wall_seconds=float(np.median([x['wall'] for x in measurements]))))
             # Full-program sanity check at the smallest size only. Advance the
             # isolated RNG by the two draws per surface-area trial, outside timings.
-            if n == min(args.sizes):
+            if n == min(case[0] for case in cases):
                 print(f'{n} atoms: full PoreBlazer validation', flush=True)
                 full_times = pb_run(full, directory, args.timeout)
                 full_curve = np.loadtxt(directory / 'Total_psd_cumulative.txt')
@@ -235,12 +304,13 @@ def main():
                 print(f'{n} atoms: PoreTorch {device}', flush=True)
                 def make_field():
                     return distance_field(positions, cell, radii=RADIUS, probe_radius=0.,
-                        grid_spacing=SPACING, device=device, torch_dtype=torch.float64, masses=np.full(n,12.011))
+                        grid_spacing=spacing, device=device, torch_dtype=torch.float64, masses=np.full(n,12.011))
                 _, field = timed(make_field, device)
                 assert list(field.grid.shape) == grid[:3]
                 assert field.n_void == grid[3]
                 field_times = [timed(make_field, device)[0] for _ in range(args.repeats)]
                 for method, weighting in CONFIGS:
+                    print(f'  {method}/{weighting}', flush=True)
                     def calculate(field=field):
                         return pore_size_distribution(field, method=method, weighting=weighting,
                             bin_width=BIN_WIDTH, max_diameter=MAX_DIAMETER, min_radius=0.)

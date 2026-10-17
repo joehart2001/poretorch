@@ -1,7 +1,9 @@
-# Small-system comparison with PoreBlazer
+# PSD benchmarks against PoreBlazer
 
 `compare_poreblazer.py` benchmarks all three PoreTorch definitions, including
-both `all_void` weightings, against PoreBlazer 4.0. The initial dataset is
+both `all_void` weightings, against PoreBlazer 4.0. Real carbon results are in
+`results/carbon/`; the original synthetic dataset is in `results/poreblazer/`.
+The synthetic dataset is
 64, 128 and 256 synthetic carbon atoms, not equilibrated carbon structures.
 Positions are uniform random points (seed 42); overlaps are allowed. This is a
 small workload comparison, not evidence of scaling on large or real materials.
@@ -25,7 +27,40 @@ The existing `benchmark.py` remains available for larger PoreTorch-only runs.
 Its older minimum-of-repeats timings and float32 settings should not be mixed
 with this comparison's float64 median timings.
 
-## Matching inputs
+## Amorphous-carbon structures
+
+The real-carbon benchmark uses the supplied MACE-MP-0b3 `run_1` cooled structures:
+6×6 (216 atoms) followed by 8×8 (512 atoms), liquid temperature 8000 K,
+annealing temperature 3000 K, density 1 g/cm³, quench timestep 0.5 fs and
+annealing timestep 1 fs. Original file paths and SHA-256 hashes are recorded in
+`results/carbon/metadata.json`, and unchanged LAMMPS inputs are retained as
+`216/source.data` and `512/source.data`.
+
+```bash
+OMP_NUM_THREADS=1 OPENBLAS_NUM_THREADS=1 python -m benchmarks.compare_poreblazer \
+    --poreblazer-src /path/to/PoreBlazer/src \
+    --structures benchmarks/results/carbon/216/source.data \
+                 benchmarks/results/carbon/512/source.data \
+    --repeats 3 --output /tmp/poretorch-carbon-repeat
+```
+
+`--structures` accepts fully periodic cubic carbon LAMMPS data files, in run
+order. Image flags are ignored, preserving the wrapped coordinates in the file;
+only the common origin translation described below is applied. Cell lengths and
+relative atomic positions are never rescaled. All radius, probe, binning, dtype,
+thread and timing settings remain the same as the synthetic comparison.
+
+Unlike the synthetic cells, these cells are not rounded to multiples of the
+requested spacing. PoreTorch instead matches PoreBlazer's actual grid. The 6×6
+cell uses 32³ points at 0.5085443465 Å. For the 8×8 cell, requesting exactly
+0.5 Å exposes PoreBlazer's second integer-truncation issue: it calculates spacing
+from 43 points, then rounds the resulting count down to 42, leaving a grid plane
+unrepresented. The benchmark selects the nearest stable finer grid, 44³ at
+0.4931339118 Å, for both codes. The structure is unchanged and PoreBlazer's
+source is not patched to change its grid algorithm. `grid.json` records requested
+and actual spacings, and the harness rejects grids that do not tile the cell.
+
+## Shared parameters and synthetic inputs
 
 - Fully periodic cubic cells, approximately 0.05 atoms/Å³. Cell lengths are
   rounded up to a multiple of 0.5 Å so both grids coincide: PoreBlazer normally
@@ -95,3 +130,20 @@ and source hashes, instrumentation patches, compiler logs, inputs, per-method
 PSD arrays, PoreBlazer curves and validation logs. `metadata.json` identifies the
 PoreBlazer commit and compiler flags. The published run uses a Ryzen 9 9950X
 (single CPU thread) and RTX 5090, with GNU Fortran 13.3 `-O2`.
+
+## Synthetic reference timings
+
+The earlier synthetic-structure results are retained for reference. These are
+field + PSD compute seconds, with the same hardware and timing convention.
+
+| Implementation / method | 64 atoms | 128 atoms | 256 atoms |
+|---|---:|---:|---:|
+| PoreBlazer CPU · sampled covering | 0.1882 | 0.4405 | 0.8904 |
+| PoreTorch CPU · `all_void`, voxel | 0.1079 | 0.1820 | 0.5522 |
+| PoreTorch CPU · `all_void`, sphere | 0.1068 | 0.1824 | 0.5516 |
+| PoreTorch CPU · `covering` | 0.8110 | 1.9367 | 5.3069 |
+| PoreTorch CPU · `packed` | 0.1076 | 0.1839 | 0.5553 |
+| PoreTorch GPU · `all_void`, voxel | 0.0044 | 0.0064 | 0.0177 |
+| PoreTorch GPU · `all_void`, sphere | 0.0043 | 0.0064 | 0.0177 |
+| PoreTorch GPU · `covering` | 0.0314 | 0.0735 | 0.2005 |
+| PoreTorch GPU · `packed` | 0.0053 | 0.0080 | 0.0209 |

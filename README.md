@@ -172,49 +172,53 @@ periodic percolation dimensionality.
 
 ## Benchmarks
 
-Small synthetic periodic carbon structures, with all three methods and both
-`all_void` weightings. Times below are **field + PSD compute time in seconds**,
-excluding imports, compilation and file output. Medians of three runs after
-one warm-up; CUDA timings are synchronized.
+Amorphous-carbon MACE-MP-0b3 `run_1` structures: **6×6 (216 atoms)** and
+**8×8 (512 atoms)**, cooled after annealing at 3000 K, at density 1 g/cm³.
+All methods and both `all_void` weightings are reported. Times are **field + PSD
+compute seconds**, median of three runs after one warm-up; CUDA is synchronized.
+Imports, compilation and file output are excluded.
 
-Hardware: AMD Ryzen 9 9950X (one CPU thread), NVIDIA RTX 5090. PoreTorch uses
-float64 and `cell_list`; PoreBlazer 4.0 uses GNU Fortran 13.3, `-O2`. Both use
-identical grids at 0.5 Å spacing, atomic radius 1.7 Å, a point probe (radius 0),
-0.25 Å diameter bins, and no connected-pore or minimum-radius filtering.
+Hardware: Ryzen 9 9950X (one CPU thread), RTX 5090. PoreTorch uses float64 and
+`cell_list`; PoreBlazer 4.0 uses GNU Fortran 13.3, `-O2`. Both use atomic radius
+1.7 Å, a point probe (radius 0), 0.25 Å diameter bins, and no minimum-radius or
+connected-pore filtering. Original cells and relative positions are preserved.
 
-| Implementation / method | 64 atoms | 128 atoms | 256 atoms |
-|---|---:|---:|---:|
-| PoreBlazer CPU · sampled covering | 0.1882 | 0.4405 | 0.8904 |
-| PoreTorch CPU · `all_void`, voxel | 0.1079 | 0.1820 | 0.5522 |
-| PoreTorch CPU · `all_void`, sphere | 0.1068 | 0.1824 | 0.5516 |
-| PoreTorch CPU · `covering` | 0.8110 | 1.9367 | 5.3069 |
-| PoreTorch CPU · `packed` | 0.1076 | 0.1839 | 0.5553 |
-| PoreTorch GPU · `all_void`, voxel | 0.0044 | 0.0064 | 0.0177 |
-| PoreTorch GPU · `all_void`, sphere | 0.0043 | 0.0064 | 0.0177 |
-| PoreTorch GPU · `covering` | 0.0314 | 0.0735 | 0.2005 |
-| PoreTorch GPU · `packed` | 0.0053 | 0.0080 | 0.0209 |
+| Implementation / method | 6×6 · 216 atoms | 8×8 · 512 atoms |
+|---|---:|---:|
+| PoreBlazer CPU · sampled covering | 0.3977 | 1.3296 |
+| PoreTorch CPU · `all_void`, voxel | 0.5110 | 1.5176 |
+| PoreTorch CPU · `all_void`, sphere | 0.5106 | 1.5101 |
+| PoreTorch CPU · `covering` | 4.8874 | 21.5585 |
+| PoreTorch CPU · `packed` | 0.5020 | 1.5587 |
+| PoreTorch GPU · `all_void`, voxel | 0.0163 | 0.0493 |
+| PoreTorch GPU · `all_void`, sphere | 0.0163 | 0.0493 |
+| PoreTorch GPU · `covering` | 0.1825 | 0.7906 |
+| PoreTorch GPU · `packed` | 0.0170 | 0.0512 |
 
-PoreBlazer is run through an isolated driver: surface area, limiting diameter,
-volume reporting and network-accessibility stages are omitted. Its shared
-lattice routine still includes helium-related work. For 256 atoms, its lattice
-and PSD-core times are **0.0670 s** and **0.8233 s**; PoreTorch GPU field and
-`covering` times are **0.0171 s** and **0.1831 s**. PoreBlazer's complete isolated
-subprocess, including input and output, takes **0.9026 s**. Its PSD-core timer
-excludes normalization and differentiation interleaved with file output.
+PoreBlazer uses an isolated driver that omits surface area, limiting diameter,
+volume reporting and network-accessibility stages. Its shared lattice routine
+still includes helium-related work. At 512 atoms, PoreBlazer's lattice and
+PSD-core times are **0.3366 s** and **0.9905 s**; GPU PoreTorch field and
+`covering` times are **0.0483 s** and **0.7415 s**. PoreBlazer's entire isolated
+subprocess takes **1.3424 s**. Its PSD-core timer excludes normalization and
+differentiation interleaved with file output.
 
-`covering` is the closest comparison: PoreBlazer samples 10,000 points, while
-PoreTorch evaluates every void point. GPU PoreTorch is 4.4–6.0× faster for
-field + covering on these cases; CPU PoreTorch covering is slower. `all_void`
-and `packed` have different definitions, so their timings are not equivalent
-PSD speedups. The maximum cumulative-distribution differences are 0.61–0.73
-percentage points, consistent with sampling differences. The isolated PoreBlazer
-PSD matches its full-program result exactly when given the same random draws.
+`covering` is the closest comparison: PoreBlazer samples 10,000 points while
+PoreTorch evaluates every void point. `all_void` and `packed` have different
+definitions; their timings are not equivalent PSD speedups. Maximum cumulative
+distribution differences are below **0.68 percentage points**. The isolated
+PoreBlazer PSD matches its full-program result exactly with the same random draws
+on both structures.
 
-These are uniform random structures (overlaps allowed), not equilibrated carbon;
-the results should not be extrapolated to large structures. Grid sizes are
-10,648, 21,952 and 42,875 points. See the [benchmark protocol and reproduction
-command](benchmarks/README.md), [raw timing breakdown](benchmarks/results/poreblazer/timings.csv)
-and [hardware/source metadata](benchmarks/results/poreblazer/metadata.json).
+Both codes use identical grids: **32³ at 0.508544 Å** for 6×6 and **44³ at
+0.493134 Å** for 8×8. The latter avoids a PoreBlazer integer-rounding issue that
+otherwise drops a grid plane at nominal 0.5 Å spacing; no structure is rescaled.
+These are two structures from one run, not a general scaling benchmark.
+
+See the [protocol and reproduction command](benchmarks/README.md),
+[raw timing breakdown](benchmarks/results/carbon/timings.csv), and
+[input provenance and hardware metadata](benchmarks/results/carbon/metadata.json).
+The earlier synthetic results remain in [benchmarks/README.md](benchmarks/README.md#synthetic-reference-timings).
 
 ## Numerical controls
 

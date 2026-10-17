@@ -1,0 +1,158 @@
+--- src/poreblazer.f90
++++ isolated/poreblazer.f90
+@@ -68,112 +68,33 @@
+ 
+ program poreblazer
+ use parameters
+-use results
++use lattice, only: ncubesx, ncubesy, ncubesz, ng_cubes, cube_size
++use adsorbent, only: natoms
++use random, only: rranf
+ implicit none
+-interface initialize
++interface
+     subroutine initialize(arg)
+         character(len=*), optional :: arg
+     end subroutine initialize
+-end interface initialize
+-
+-
+-character(len=256) :: arg
+-
+-write(*,*) "!-------------------------------------------------------!"
+-write(*,*) "! Welcome to PB4.0                                      !"
+-write(*,*) "! Developed by: Lev Sarkisov, 2012/20                   !"
+-write(*,*) "! Cite: Sarkisov, Harrison, Molecular Simulation, 2011  !"
+-write(*,*) "!-------------------------------------------------------!"
+-write(*,*)
+-
+-write(*,*) "!-------------------------------------------------------!"
+-write(*,*) "! The program first goes through several preliminary    !"
+-write(*,*) "! initializations, associated with reading parameters.  !"
+-write(*,*) "!-------------------------------------------------------!"
+-write(*,*) 
+-
+-write(*,*) "Step 1/10"
+-
+-if (command_argument_count() > 0) then
+-    call get_command_argument(1, arg)
+-    call initialize(arg)
+-else
+-    call initialize
++end interface
++integer(kind=8) :: start, finish, rate
++integer :: draw
++real(kind=8) :: discarded
++call initialize('input.dat')
++call system_clock(start, rate)
++call lattice_calculations
++call system_clock(finish)
++write(*,*) 'BENCH_LATTICE', real(finish-start,8)/real(rate,8)
++write(*,*) 'BENCH_GRID', ncubesx, ncubesy, ncubesz, ng_cubes
++write(*,*) 'BENCH_SPACING', cube_size
++property = 'Total'
++! Validation only: consume the draws used by the full surface-area routine.
++if (command_argument_count() > 1) then
++    do draw = 1, 2*natoms*nsample
++        discarded = rranf()
++    end do
+ end if
+-
+-    volume = fundcell_getvolume(fcell)
+-    write(*,'(a,f12.3)') " System volume in A^3:    ",  volume
+-    write(*,'(a,f12.3)') " System mass, g/mol:      ",  smass
+-    write(*,'(a,f12.3)') " System density, g/cm^3:  ",  rho
+-    write(*,*)
+-    write(*,*) "-------------------------------------------------------"
+-    write(*,*) "If calculated density is  different from the  reported "
+-    write(*,*) "crystallographic one,  make sure you remove unresolved "
+-    write(*,*) "atoms from the adsorbent structure file"
+-    write(*,*) "------------------------------------------------------"
+-    write(*,*)
+-    write(100,'(a,f12.3)') "V_A^3 ",  volume
+-    write(100,'(a,f12.3)') "M _g/mol ",  smass
+-    write(100,'(a,f12.3)') "RHO_g/cm^3 ",  rho
+- 
+-write(*,*) "Step 2/10"
+-call lattice_calculations
+-call limiting_diameter           ! calculation of the pore limiting diamater
+-
+-!--------------------------------------------------------------------------------------
+-!      Now we sequentially call several routines where the actual
+-!      analysis of the structure is performed
+-!--------------------------------------------------------------------------------------
+-
+-write(*,*)
+-write(*,*) "!=======================================================!"
+-write(*,*)
+-write(*,*) "!--------------------------------------------------------!"
+-write(*,*) "! Phase 1: Total properties                              !"
+-write(*,*) "!--------------------------------------------------------!"
+-write(*,*)
+-
+-
+-property = "Total "
+-write(*,*) "Step 3/10"
+-call surface_area                ! surface area
+-write(*,*) "Step 4/10"
+-call pore_distribution           ! geometric pore size distribution
+-write(*,*) "Step 5/10"
+-call volumes                     ! various volumes
+-
+-write(*,*)
+-write(*,*) "!=======================================================!"
+-write(*,*)
+-write(*,*) "!--------------------------------------------------------!"
+-write(*,*) "! Phase 2: Network-accessible properties                 !"
+-write(*,*) "!--------------------------------------------------------!"
+-write(*,*)
+-
+-property = "Network-accessible "
+-write(*,*) "Step 6/10"
+-call geom_lattice                ! returns lattice accessible to point probe
+-write(*,*) "Step 7/10"
+-call helium_lattice              ! returns lattice accessible to helium
+-write(*,*) "Step 8/10"
+-call nitrogen_lattice            ! returns lattice accessible to nitrogen
+-
+-
+-write(*,*) "Step 9/10"
+-call surface_area                ! accessible surface area
+-write(*,*) "Step 10/10"
+-call pore_distribution           ! accessible geometric pore size distribution
+-write(*,*) "Step 11/10"
+-call volumes                     ! accessible volumes
+-
+-
+-!call finalize
+-
+-write(*,*) "!-------------------------------------------------------!"
+-write(*,*) "! Simulation complete                                   !"
+-write(*,*) "!-------------------------------------------------------!"
+-
+-
++call pore_distribution
+ end program
+ 
+ !--------------------------------------------------------------------------------------
+@@ -930,6 +851,10 @@
+     real*8                                :: deldis1, deldis2, deldis
+     real*8                                :: x, y, z
+     integer,allocatable                   :: connolly_volume(:)
++    integer(kind=8) :: bench_start, bench_finish, bench_rate
++
++    call system_clock(bench_start, bench_rate)
++
+ 
+     write(*,*) "!-------------------------------------------------------!"
+     write(*,*) "! Starting pore size distribution calculations          !"
+@@ -1044,6 +969,9 @@
+     ffv = ffv*dble(ng_cubes)/dble(ntot)
+     free_volume = ffv*volume
+ 
++
++    call system_clock(bench_finish)
++    write(*,*) 'BENCH_PSD', real(bench_finish-bench_start,8)/real(bench_rate,8)
+ 
+     open(13, file=Trim(adjustl(property))//'_psd_cumulative.txt', status='unknown') ! The file for cumulative Vp function
+     open(14, file=Trim(adjustl(property))//'_psd.txt', status='unknown')            ! File containing pore size distribution
