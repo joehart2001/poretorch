@@ -1,4 +1,4 @@
-"""Plot mean carbon benchmark times and covering speedups."""
+"""Plot mean carbon benchmark times."""
 from __future__ import annotations
 
 import argparse
@@ -8,7 +8,6 @@ from pathlib import Path
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
-from matplotlib.ticker import MaxNLocator, ScalarFormatter
 
 METHODS = [
     ('all_void', 'voxel', '#0072B2', 'o'),
@@ -32,7 +31,7 @@ def plot(directory):
         return ([float(selected[n]['seconds']) for n in sizes],
                 [float(selected[n]['seconds_std']) for n in sizes])
 
-    fig, (ax, ax_ratio) = plt.subplots(1, 2, figsize=(10.5, 4.2))
+    fig, ax = plt.subplots(figsize=(7, 4.5))
     for method, weighting, color, marker in METHODS:
         times, deviations = series('PoreTorch', method, weighting)
         ax.errorbar(sizes, times, yerr=deviations, color=color, marker=marker,
@@ -44,24 +43,13 @@ def plot(directory):
     ax.set_title('Mean time across three structures')
     ax.legend(frameon=False, fontsize=8)
 
-    covering, _ = series('PoreTorch', 'covering', 'voxel')
-    ratios = [baseline / time for baseline, time in zip(pb, covering)]
-    ax_ratio.plot(sizes, ratios, color='#D55E00', marker='D', linewidth=1.7)
-    ax_ratio.axhline(1, color='#777777', linewidth=1, linestyle=':')
-    ax_ratio.set_ylabel('Speedup (×)')
-    ax_ratio.set_title('Covering relative to PoreBlazer')
-    for axis in (ax, ax_ratio):
-        axis.set_xscale('log')
-        axis.set_yscale('log')
-        axis.set_xticks(sizes, [f'{n:,}' for n in sizes])
-        axis.minorticks_off()
-        axis.set_xlabel('Carbon atoms')
-        axis.grid(alpha=.2)
-        axis.spines[['top', 'right']].set_visible(False)
-    ax_ratio.set_yscale('linear')
-    ax_ratio.set_ylim(.8, max(ratios) * 1.1)
-    ax_ratio.yaxis.set_major_locator(MaxNLocator(nbins=5, integer=True))
-    ax_ratio.yaxis.set_major_formatter(ScalarFormatter())
+    ax.set_xscale('log')
+    ax.set_yscale('log')
+    ax.set_xticks(sizes, [f'{n:,}' for n in sizes])
+    ax.minorticks_off()
+    ax.set_xlabel('Carbon atoms')
+    ax.grid(alpha=.2)
+    ax.spines[['top', 'right']].set_visible(False)
     fig.tight_layout()
     for extension in ('svg', 'png'):
         path = directory/f'scaling.{extension}'
@@ -69,11 +57,6 @@ def plot(directory):
         if extension == 'svg':
             path.write_text('\n'.join(line.rstrip() for line in path.read_text().splitlines())+'\n')
     plt.close(fig)
-    with (directory/'speedups.csv').open('w') as f:
-        writer = csv.DictWriter(f, fieldnames=['n_atoms', 'poreblazer_over_poretorch'])
-        writer.writeheader()
-        writer.writerows(dict(n_atoms=n, poreblazer_over_poretorch=ratio)
-                         for n, ratio in zip(sizes, ratios))
 
 
 if __name__ == '__main__':

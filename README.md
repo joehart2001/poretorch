@@ -39,10 +39,9 @@ its full calculation. Error bars show standard deviation.
 | PoreTorch GPU `all_void` | 0.028 | 0.060 | 0.225 | 0.635 |
 | PoreTorch GPU `covering` | 0.195 | 0.846 | 7.606 | 42.678 |
 | PoreTorch GPU `packed` | 0.028 | 0.062 | 0.229 | 0.648 |
-| `covering` speedup | 4.61× | 3.57× | 2.16× | 1.64× |
 
-Ryzen 9 9950X (one CPU thread) and RTX 5090. `covering` is the closest
-comparison to PoreBlazer. `all_void` and `packed` measure different distributions.
+Ryzen 9 9950X (one CPU thread) and RTX 5090. The methods use different
+pore-size definitions.
 See the [benchmark guide](benchmarks/README.md) for settings and results.
 
 ## Quick start

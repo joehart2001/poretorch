@@ -31,7 +31,7 @@ No radius or connected-pore filter is applied. `all_void` uses default voxel
 weighting. PoreTorch geometry uses float64.
 
 PoreBlazer samples 10,000 points. PoreTorch `covering` evaluates every void
-point and is the closest comparison. Speedups are ratios of mean times.
+point. The three PoreTorch methods use different pore-size definitions.
 
 Hardware is a Ryzen 9 9950X with one CPU thread and an RTX 5090.
 Software is PyTorch 2.8.0, CUDA 12.8 and PoreBlazer 4.0 built with
