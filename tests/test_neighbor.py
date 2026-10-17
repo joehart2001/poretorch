@@ -68,6 +68,23 @@ def test_resolved_points_always_match_brute_force(cell, random_structure):
     assert bool((values[~resolved] >= reference[~resolved] - 1e-12).all())
 
 
+@pytest.mark.parametrize('pbc', [(False, False, False), (True, True, False)])
+def test_open_boundary_ring_is_not_prematurely_exhaustive(pbc):
+    bins, positions, radii, mic = _bins(
+        np.diag([9., 9., 9.]), [[0.5, 0.5, 0.5]], 1.0, bin_width=3.0, pbc=pbc,
+    )
+    point = torch.tensor([[0.5, 0.5, 8.5]], dtype=torch.float64)
+    assert bins.coverage_radius(1) == pytest.approx(3.0)
+    _, resolved = query_min_surface_distance(point, bins, ring=1)
+    assert not resolved.item()
+
+    assert np.isinf(bins.coverage_radius(2))
+    value, resolved = query_min_surface_distance(point, bins, ring=2)
+    assert resolved.item()
+    assert value.item() == pytest.approx(7.0)
+    assert torch.allclose(value, brute_min_surface_distance(point, positions, radii, mic))
+
+
 def test_exhaustive_ring_needs_no_fallback(cell, random_structure):
     positions = random_structure(cell, n_atoms=30, seed=54)
     bins, positions_t, radii_t, mic = _bins(cell, positions, 1.7, bin_width=100.0)

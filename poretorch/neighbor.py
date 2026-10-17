@@ -94,9 +94,14 @@ class AtomBins:
             already wraps around every axis and the search is exhaustive.
         """
         counts = self.counts.detach().cpu().numpy()
+        periodic = self.mic.pbc.detach().cpu().numpy()
         # An axis with few enough bins is covered end to end by this ring and so
-        # places no limit on the coverage radius.
-        limited = [w for m, w in zip(counts, self.widths) if m > 2 * ring + 1]
+        # places no limit on the coverage radius. At an open boundary, half of
+        # the ring falls outside the cell, so only ring + 1 bins are guaranteed.
+        limited = [
+            w for m, w, wraps in zip(counts, self.widths, periodic)
+            if m > (2 * ring + 1 if wraps else ring + 1)
+        ]
         if not limited:
             return float("inf")
         return float(ring * min(limited))
