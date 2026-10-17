@@ -214,7 +214,7 @@ if __name__ == '__main__':
     parser.add_argument('--dataset', type=Path, default=Path('benchmarks/inputs/carbon'))
     parser.add_argument('--output', type=Path, default=Path('benchmarks/results/carbon_end_to_end'))
     parser.add_argument('--sizes', nargs='+', type=int, default=[216, 512, 1728, 4096])
-    parser.add_argument('--devices', nargs='+', choices=['cpu', 'cuda'], default=['cpu', 'cuda'])
+    parser.add_argument('--devices', nargs='+', choices=['cpu', 'cuda'], default=['cuda'])
     parser.add_argument('--cpu-max-atoms', type=int, default=512,
                         help='Run PoreTorch CPU methods only up to this size')
     parser.add_argument('--repeats', type=int, default=3)

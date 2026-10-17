@@ -53,11 +53,10 @@ def plot(directory):
 
     fig, axes = plt.subplots(1, 2, figsize=(11, 4.8), sharey=True)
     for ax, (field, title) in zip(axes, TIMINGS):
-        for device, dash, device_label in [('cpu', '--', 'CPU'), ('cuda', '-', 'GPU')]:
-            for method, weighting, label, color, marker in METHODS:
-                ax.plot(sizes, values(device, method, weighting, field),
-                        linestyle=dash, color=color, marker=marker, linewidth=1.7,
-                        markersize=5, label=f'{device_label} {label}')
+        for method, weighting, label, color, marker in METHODS:
+            ax.plot(sizes, values('cuda', method, weighting, field),
+                    color=color, marker=marker, linewidth=1.7,
+                    markersize=5, label=f'GPU {label}')
         ax.plot(sizes, [pb[n] for n in sizes], color='#222222', marker='X',
                 linewidth=2, label='PoreBlazer CPU (new process)')
         axes_style(ax, 'Time to saved PSD (s)')
@@ -71,15 +70,14 @@ def plot(directory):
 
     fig, ax = plt.subplots(figsize=(7.5, 4))
     speedups = []
-    for device, color in [('cpu', '#0072B2'), ('cuda', '#D55E00')]:
-        for (field, title), dash, marker in zip(TIMINGS, ['--', '-'], ['s', 'o']):
-            times = values(device, 'covering', 'voxel', field)
-            ratios = [pb[n]/t for n, t in zip(sizes, times)]
-            ax.plot(sizes, ratios, color=color, linestyle=dash, marker=marker,
-                    label=f'{"GPU" if device == "cuda" else "CPU"} · {title.lower()}')
-            speedups.extend(dict(n_atoms=n, device=device, start=title,
-                                 poreblazer_over_poretorch=ratio)
-                            for n, ratio in zip(sizes, ratios) if math.isfinite(ratio))
+    for (field, title), dash, marker in zip(TIMINGS, ['--', '-'], ['s', 'o']):
+        times = values('cuda', 'covering', 'voxel', field)
+        ratios = [pb[n]/t for n, t in zip(sizes, times)]
+        ax.plot(sizes, ratios, color='#D55E00', linestyle=dash, marker=marker,
+                label=f'GPU · {title.lower()}')
+        speedups.extend(dict(n_atoms=n, device='cuda', start=title,
+                             poreblazer_over_poretorch=ratio)
+                        for n, ratio in zip(sizes, ratios) if math.isfinite(ratio))
     ax.axhline(1, color='#777777', linewidth=1, linestyle=':')
     axes_style(ax, 'PoreBlazer time / PoreTorch time (×)')
     ax.yaxis.set_major_locator(LogLocator(base=10, subs=(1, 2, 5)))

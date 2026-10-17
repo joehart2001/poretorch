@@ -1,8 +1,4 @@
 n_atoms,device,start,poreblazer_over_poretorch
-216,cpu,New process,0.12426300724770105
-512,cpu,New process,0.11440181822702421
-216,cpu,Warm start,0.1847995688128133
-512,cpu,Warm start,0.130711220034201
 216,cuda,New process,0.256019042600056
 512,cuda,New process,0.7293863190781483
 1728,cuda,New process,1.6481381400231634

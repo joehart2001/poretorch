@@ -11,13 +11,12 @@ With PoreTorch, ASE, NumPy, GNU Fortran and Make installed, run from the reposit
 ```bash
 python -m benchmarks.benchmark_end_to_end \
   --poreblazer-src /path/to/PoreBlazer/src \
-  --sizes 216 512 1728 4096 --repeats 3
+  --sizes 216 512 1728 4096 --devices cuda --repeats 3
 python -m benchmarks.plot_end_to_end
 ```
 
-PoreTorch CPU runs stop at 512 atoms by default. Larger cases use GPU only.
-Use `--cpu-max-atoms` to change this limit or `--devices cpu` for CPU only. Prepared structures and parameters are
-in [inputs/carbon](inputs/carbon). Results are written to
+The comparison uses PoreTorch on GPU and PoreBlazer on CPU.
+Prepared structures and parameters are in [inputs/carbon](inputs/carbon). Results are written to
 `results/carbon_end_to_end`. Use `--output` to select another directory.
 
 ## Timing and settings

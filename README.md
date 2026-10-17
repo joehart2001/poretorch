@@ -176,7 +176,6 @@ Time to save a PSD for amorphous carbon at 1 g/cm³, in seconds (median of
 three runs). **New process** includes startup. **Warm start** measures a
 complete `psd()` call after Python and CUDA initialization. Input reading and
 saving are included. PoreBlazer timings include its full calculation.
-PoreTorch CPU timings are reported up to 512 atoms.
 
 ![PSD scaling](benchmarks/results/carbon_end_to_end/scaling.svg)
 
@@ -185,10 +184,6 @@ PoreTorch CPU timings are reported up to 512 atoms.
 | Method | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
 |---|---:|---:|---:|---:|
 | PoreBlazer CPU | 0.915 | 2.767 | 15.881 | 69.553 |
-| PoreTorch CPU · `all_void`, voxel | 2.973 | 4.870 | n/a | n/a |
-| PoreTorch CPU · `all_void`, sphere | 2.954 | 4.305 | n/a | n/a |
-| PoreTorch CPU · `covering` | 7.362 | 24.183 | n/a | n/a |
-| PoreTorch CPU · `packed` | 3.531 | 3.921 | n/a | n/a |
 | PoreTorch GPU · `all_void`, voxel | 4.160 | 3.059 | 3.168 | 3.608 |
 | PoreTorch GPU · `all_void`, sphere | 3.035 | 2.998 | 3.050 | 3.386 |
 | PoreTorch GPU · `covering` | 3.573 | 3.793 | 9.636 | 44.121 |
@@ -198,10 +193,6 @@ PoreTorch CPU timings are reported up to 512 atoms.
 
 | Method | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
 |---|---:|---:|---:|---:|
-| PoreTorch CPU · `all_void`, voxel | 0.530 | 1.566 | n/a | n/a |
-| PoreTorch CPU · `all_void`, sphere | 0.532 | 1.579 | n/a | n/a |
-| PoreTorch CPU · `covering` | 4.951 | 21.165 | n/a | n/a |
-| PoreTorch CPU · `packed` | 0.521 | 1.554 | n/a | n/a |
 | PoreTorch GPU · `all_void`, voxel | 0.032 | 0.061 | 0.208 | 0.543 |
 | PoreTorch GPU · `all_void`, sphere | 0.025 | 0.063 | 0.209 | 0.545 |
 | PoreTorch GPU · `covering` | 0.205 | 0.801 | 6.785 | 41.337 |
@@ -214,8 +205,6 @@ Warm-start ratios use the same PoreBlazer new-process baseline.
 
 | PoreTorch | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms |
 |---|---:|---:|---:|---:|
-| CPU, new process | 0.12× | 0.11× | n/a | n/a |
-| CPU, warm start | 0.18× | 0.13× | n/a | n/a |
 | GPU, new process | 0.26× | 0.73× | 1.65× | 1.58× |
 | GPU, warm start | 4.47× | 3.45× | 2.34× | 1.68× |
 
