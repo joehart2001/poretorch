@@ -1,0 +1,40 @@
+{
+  "n_atoms": 32768,
+  "n_structures": 1,
+  "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3_no_cool/sim_32x32_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta0.5fs/outputs_32x32_melt_8000K_quench_rho_1_dt_0.5fs/anneal_3000/data_liquid_rho1.xyz",
+  "source_sha256": "69b3d4cbb3a433c3fb25fb4baffc59627a18905a40ea7d10fe8090a408fb6386",
+  "dataset": "mp0b3_no_cool",
+  "cell_A": [
+    [
+      86.79156847369056,
+      0.0,
+      0.0
+    ],
+    [
+      0.0,
+      86.79156847369056,
+      0.0
+    ],
+    [
+      0.0,
+      0.0,
+      86.79156847369056
+    ]
+  ],
+  "grid": {
+    "shape": [
+      173,
+      173,
+      173
+    ],
+    "actual_spacing_A": 0.5016853668999455,
+    "poreblazer_requested_spacing_A": 0.5,
+    "poretorch_requested_spacing_A": 0.5016853669004472
+  },
+  "radius_A": 1.7,
+  "probe_radius_A": 0.0,
+  "bin_width_A": 0.25,
+  "max_diameter_A": 30.0,
+  "min_radius_A": 0.0,
+  "min_voxels": 1
+}

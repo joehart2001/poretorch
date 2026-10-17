@@ -1,0 +1,4 @@
+poretorch/
+poreblazer/
+*.log
+*.exitcode
