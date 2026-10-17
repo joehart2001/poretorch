@@ -141,13 +141,16 @@ class PSD:
     @property
     def normalised(self) -> np.ndarray:
         """
-        Distribution scaled to unit area in Angstrom to the minus one.
+        Histogram density with unit area, in Angstrom to the minus one.
+
+        The integral is ``normalised.sum() * bin_width_A``. Each bin includes
+        its full width, including the first and last bins.
 
         Use this to compare the *shape* of distributions from different
         structures, methods or codes without their absolute scales getting in
         the way.
         """
-        area = float(np.trapezoid(self.volume_A3, self.diameters_A))
+        area = float(self.volume_A3.sum()) * self.bin_width_A
         if area <= 0.0:
             return np.zeros_like(self.volume_A3)
         return self.volume_A3 / area
@@ -173,7 +176,7 @@ class PSD:
         """
         if self.se_volume_A3 is None:
             return None
-        area = float(np.trapezoid(self.volume_A3, self.diameters_A))
+        area = float(self.volume_A3.sum()) * self.bin_width_A
         if area <= 0.0:
             return np.zeros_like(self.se_volume_A3)
         return self.se_volume_A3 / area

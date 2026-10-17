@@ -6,6 +6,7 @@ from poretorch.cell import mic_distance
 from poretorch.field import distance_field
 from poretorch.labels import label_pores
 from poretorch.psd import (
+    PSD,
     bin_distribution,
     covering_sizes,
     pore_size_distribution,
@@ -168,7 +169,7 @@ def test_reported_units_are_consistent(cell, random_structure):
     assert np.allclose(result.dV_dd_A2, result.volume_A3 / result.bin_width_A)
     expected = result.volume_A3 * 1e-24 / (result.bin_width_A / 10.0) / result.mass_g
     assert np.allclose(result.dV_dd_cc_per_nm_per_g, expected)
-    assert np.trapezoid(result.normalised, result.diameters_A) == pytest.approx(1.0)
+    assert result.normalised.sum() * result.bin_width_A == pytest.approx(1.0)
     assert result.cumulative_fraction[-1] == pytest.approx(1.0)
 
 
@@ -189,6 +190,26 @@ def test_binning_is_exact_for_known_input():
 def test_binning_rejects_a_non_positive_width():
     with pytest.raises(ValueError, match="bin_width must be"):
         bin_distribution([1.0], [1.0], bin_width=0.0)
+
+
+@pytest.mark.parametrize('volumes, expected', [
+    ([10.], [2.]),
+    ([2., 3.], [0.8, 1.2]),
+    ([0., 2., 3., 0.], [0., 0.8, 1.2, 0.]),
+    ([0.], [0.]),
+    ([], []),
+])
+def test_normalised_histogram_preserves_full_bin_widths(volumes, expected):
+    volumes = np.asarray(volumes)
+    result = PSD(
+        diameters_A=(np.arange(len(volumes)) + 0.5) * 0.5,
+        volume_A3=volumes, bin_width_A=0.5, method='all_void',
+        total_void_volume_A3=float(volumes.sum()), se_volume_A3=volumes * 0.1,
+    )
+    np.testing.assert_allclose(result.normalised, expected)
+    np.testing.assert_allclose(result.se_normalised, np.asarray(expected) * 0.1)
+    if volumes.sum():
+        assert np.sum(result.normalised * result.bin_width_A) == pytest.approx(1.0)
 
 
 def test_binning_does_not_silently_truncate():
