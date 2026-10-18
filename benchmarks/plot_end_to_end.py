@@ -66,5 +66,5 @@ def plot(directory):
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--results', type=Path,
-                        default=Path('benchmarks/results/carbon_three_runs'))
+                        default=Path('benchmarks/report'))
     plot(parser.parse_args().results)

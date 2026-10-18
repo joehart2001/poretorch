@@ -1,8 +1,0 @@
-{
-  "n_atoms": 216,
-  "times": {
-    "psd": 0.351326906,
-    "wall": 0.8684502057731152
-  },
-  "total_cumulative_psd_exact_match": true
-}

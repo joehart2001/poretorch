@@ -1,0 +1,41 @@
+[
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "all_void",
+    "weighting": "voxel",
+    "n_atoms": 32768,
+    "n_structures": 1,
+    "samples": [
+      4.211247145198286,
+      4.202341938856989,
+      4.194373267237097
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "packed",
+    "weighting": "sphere",
+    "n_atoms": 32768,
+    "n_structures": 1,
+    "samples": [
+      4.319850862957537,
+      4.443803334143013,
+      4.345515378750861
+    ]
+  },
+  {
+    "code": "PoreTorch",
+    "device": "cuda",
+    "method": "covering",
+    "weighting": "voxel",
+    "n_atoms": 32768,
+    "n_structures": 1,
+    "samples": [
+      2187.843204547651,
+      2187.999492261093,
+      2187.9388196342625
+    ]
+  }
+]

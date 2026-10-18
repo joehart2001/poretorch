@@ -1,0 +1,4 @@
+code,device,method,weighting,n_atoms,n_structures,seconds
+PoreTorch,cuda,all_void,voxel,32768,1,4.202341938856989
+PoreTorch,cuda,packed,sphere,32768,1,4.345515378750861
+PoreTorch,cuda,covering,voxel,32768,1,2187.9388196342625

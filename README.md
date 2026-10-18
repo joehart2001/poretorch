@@ -3,7 +3,7 @@
 # PoreTorch
 
 PoreTorch computes geometric pore-size distributions from atomistic structures.
-It supports periodic triclinic cells, runs on a GPU when one is available, and
+It supports both orthogonal and triclinic simulation cells, runs on a GPU when one is available, and
 falls back to the CPU automatically.
 
 The package accepts ASE `Atoms`, trajectories, and structure files readable by
@@ -27,11 +27,11 @@ python -m pip install -e .
 
 ## Benchmarks
 
-For 216–4,096 atoms, times are averaged across three structures (runs 1–3).
-The 32,768-atom case uses one uncooled structure. PoreTorch uses warm starts.
-PoreBlazer includes its full calculation. Error bars show standard deviation across structures. `-` means pending.
+For 216–4,096 atoms, times are averaged across three structures.
+The 32,768-atom case uses one structure. PoreTorch uses warm starts.
+PoreBlazer includes its full calculation. Error bars show standard deviation across structures.
 
-![PSD benchmarks](benchmarks/results/carbon_report/scaling.svg)
+![PSD benchmarks](benchmarks/report/scaling.svg)
 
 | Time (s) | 216 atoms | 512 atoms | 1,728 atoms | 4,096 atoms | 32,768 atoms |
 |---|---:|---:|---:|---:|---:|

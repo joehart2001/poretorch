@@ -120,9 +120,9 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('--small-results', type=Path, default=Path('benchmarks/results/carbon_three_runs'))
-    parser.add_argument('--large-results', type=Path, default=Path('benchmarks/results/carbon_32768'))
-    parser.add_argument('--output', type=Path, default=Path('benchmarks/results/carbon_report'))
+    parser.add_argument('--small-results', type=Path, default=Path('benchmarks/results'))
+    parser.add_argument('--large-results', type=Path, default=Path('benchmarks/results/32768/run_1'))
+    parser.add_argument('--output', type=Path, default=Path('benchmarks/report'))
     parser.add_argument('--readme', type=Path, default=Path('README.md'))
     parser.add_argument('--watch', action='store_true')
     parser.add_argument('--interval', type=float, default=30.)

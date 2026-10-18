@@ -1,5 +1,0 @@
-{"state": "building", "updated_utc": "2026-10-18T16:11:24.674468+00:00"}
-{"state": "running", "updated_utc": "2026-10-18T16:11:26.961071+00:00", "repeat": 1, "repeats": 1}
-{"state": "running", "updated_utc": "2026-10-18T17:17:23.919674+00:00", "completed_repeat": 1, "seconds": 3956.9451370739844}
-{"state": "complete", "updated_utc": "2026-10-18T17:17:23.923022+00:00"}
-2026-10-18T17:17:31.422591+00:00 updated report: 4/4 large-case results complete
