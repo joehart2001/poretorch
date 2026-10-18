@@ -97,8 +97,11 @@ def main(args):
                     subprocess.run([str(exe), 'input.dat'], cwd=run, env=env,
                                    stdout=log, stderr=subprocess.STDOUT, check=True)
                     samples.append(time.perf_counter()-start)
+                (run/'elapsed_seconds.json').write_text(json.dumps(samples[-1])+'\n')
                 curve = (run/'Total_psd_cumulative.txt').read_text()
-                if not all(math.isfinite(float(value)) for value in curve.split()):
+                values = [float(value) for line in curve.splitlines()
+                          for value in line.split('#', 1)[0].split()]
+                if not values or not all(math.isfinite(value) for value in values):
                     raise ValueError('nonfinite PSD output')
                 if reference is not None and curve != reference:
                     raise ValueError('PSD changed between identical repeats')

@@ -1,0 +1,13 @@
+[
+  {
+    "code": "PoreBlazer",
+    "device": "cpu",
+    "method": "full",
+    "weighting": "voxel",
+    "n_atoms": 32768,
+    "n_structures": 1,
+    "samples": [
+      3956.9451370739844
+    ]
+  }
+]

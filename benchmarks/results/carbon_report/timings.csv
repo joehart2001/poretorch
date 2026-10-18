@@ -15,7 +15,7 @@ PoreBlazer,cpu,full,voxel,4096,3,70.14826946286485,0.5381617859930888,complete
 PoreTorch,cuda,all_void,voxel,4096,3,0.6348387249745429,0.07939960270874509,complete
 PoreTorch,cuda,covering,voxel,4096,3,42.67783771082759,3.2361799409381975,complete
 PoreTorch,cuda,packed,sphere,4096,3,0.648118927453955,0.07862892240266918,complete
-PoreBlazer,cpu,full,voxel,32768,1,,,pending
+PoreBlazer,cpu,full,voxel,32768,1,3956.9451370739844,,complete
 PoreTorch,cuda,all_void,voxel,32768,1,4.202341938856989,,complete
-PoreTorch,cuda,covering,voxel,32768,1,,,pending
+PoreTorch,cuda,covering,voxel,32768,1,2187.9388196342625,,complete
 PoreTorch,cuda,packed,sphere,32768,1,4.345515378750861,,complete

@@ -1,0 +1,2 @@
+code,device,method,weighting,n_atoms,n_structures,seconds
+PoreBlazer,cpu,full,voxel,32768,1,3956.9451370739844

@@ -1,0 +1,67 @@
+{
+  "host": "phy-tcm-pc79",
+  "program": "poreblazer",
+  "pid": 1885690,
+  "started_utc": "2026-10-18T16:11:24.668237+00:00",
+  "python": "3.12.3",
+  "repeats": 1,
+  "n_structures": 1,
+  "cpu": "AMD Ryzen 9 9950X 16-Core Processor",
+  "cpu_threads": 1,
+  "inputs": {
+    "n_atoms": 32768,
+    "n_structures": 1,
+    "source": "/home/jh2536/amorphous-carbon/generate_pores/mp0b3_no_cool/sim_32x32_TLiquid8000_Tanneal3000_rho1_dtq0.5fs_dta0.5fs/outputs_32x32_melt_8000K_quench_rho_1_dt_0.5fs/anneal_3000/data_liquid_rho1.xyz",
+    "source_sha256": "69b3d4cbb3a433c3fb25fb4baffc59627a18905a40ea7d10fe8090a408fb6386",
+    "dataset": "mp0b3_no_cool",
+    "cell_A": [
+      [
+        86.79156847369056,
+        0.0,
+        0.0
+      ],
+      [
+        0.0,
+        86.79156847369056,
+        0.0
+      ],
+      [
+        0.0,
+        0.0,
+        86.79156847369056
+      ]
+    ],
+    "grid": {
+      "shape": [
+        173,
+        173,
+        173
+      ],
+      "actual_spacing_A": 0.5016853668999455,
+      "poreblazer_requested_spacing_A": 0.5,
+      "poretorch_requested_spacing_A": 0.5016853669004472
+    },
+    "radius_A": 1.7,
+    "probe_radius_A": 0.0,
+    "bin_width_A": 0.25,
+    "max_diameter_A": 30.0,
+    "min_radius_A": 0.0,
+    "min_voxels": 1
+  },
+  "compiler": "GNU Fortran (Ubuntu 13.3.0-6ubuntu2~24.04.1) 13.3.0",
+  "compiler_flags": "-cpp -O2",
+  "poreblazer_commit": "32e589918c6a6edb51084504af3389455197edbb",
+  "source_sha256": {
+    "defaults.f90": "6ca694e0d9db241d6152b6e5f286c28ca237fcb0996d2aecc12aca436515e83f",
+    "utils.f90": "06e3a74ad4858e1c5f4b4335c10ddb0669fd9bc2db90adc8dece74bf87f71b16",
+    "percolation.f90": "8a5e2c54f2ab4821fcb4b712362fa69c7d9171f771db7713970d3c8bdf361816",
+    "random.f90": "2dfdc73e7f0c71cb258996b5ac53e78efd0639173ed87aced3666ae2fc4577ea",
+    "fundcell.f90": "aea911de74e33c3b0c5d4f474bee8f8351859809ab2500aea2a9ad9074c74744",
+    "matrixops.f90": "2a7238e8cac459f27f560d623bdc1f92873a2e1b67c61756eca649886e858563",
+    "matrix.f90": "51bc0f83d7d5c79e749c7a1aeccf15c22b625a11633f9b5b9854d07ffe6241e8",
+    "molecule.f90": "ad669fe5177f2ca5c57908b584b9b1da6179acad9888cc2eec1d1a0db6828149",
+    "poreblazer.f90": "26dec1eca8bc04aef4fc193d34795063f5e4e6c5d5faafec23b1067656039b79",
+    "vector.f90": "dbc7595ba330a0e5c42e931fb6945b734cd80577facd32cf0d8c3a70837e9746",
+    "Makefile_gfort": "df7e57d536cc0bfea0e88c9a8ad0464083abecc3ad8ae7e6697076881fc1ad95"
+  }
+}
