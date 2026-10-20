@@ -203,3 +203,19 @@ The grid uses voxel centres and tiles the cell exactly. Minimum-image distances
 use a Minkowski-reduced basis, including for skewed triclinic cells.
 
 PoreTorch is released under the MIT license.
+
+## Citation
+
+If you use PoreTorch in your work, please cite:
+
+```bibtex
+@inproceedings{hart2026challenging,
+title={Challenging Atomistic Foundation Models on Disordered Carbons},
+author={Joseph Hart and Samuel G. H. Brookes and Fabian L. Thiemann and Christoph Schran},
+booktitle={Sim2Science: ML with Imperfect Scientific Models},
+year={2026},
+url={https://openreview.net/forum?id=Gndd84s8wZ}
+}
+```
+
+Citation metadata is also available in [CITATION.cff](CITATION.cff).

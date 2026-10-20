@@ -1,5 +1,5 @@
 cff-version: 1.2.0
-message: "If you use PoreTorch, please cite it as below."
+message: "If you use PoreTorch, please cite the paper in preferred-citation below."
 type: software
 title: "PoreTorch: GPU-accelerated geometric pore-size distributions"
 authors:
@@ -10,3 +10,18 @@ repository-code: "https://github.com/joehart2001/PoreTorch"
 url: "https://github.com/joehart2001/PoreTorch"
 license: MIT
 year: 2026
+preferred-citation:
+  type: conference-paper
+  title: "Challenging Atomistic Foundation Models on Disordered Carbons"
+  authors:
+    - family-names: Hart
+      given-names: Joseph
+    - family-names: Brookes
+      given-names: Samuel G. H.
+    - family-names: Thiemann
+      given-names: Fabian L.
+    - family-names: Schran
+      given-names: Christoph
+  collection-title: "Sim2Science: ML with Imperfect Scientific Models"
+  year: 2026
+  url: "https://openreview.net/forum?id=Gndd84s8wZ"
